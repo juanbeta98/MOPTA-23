@@ -1,0 +1,802 @@
+{
+  "version": "4.67.0",
+  "application": {
+    "aimms.widget.type": {
+      "literal": "application"
+    },
+    "pages": {
+      "literal": {
+        "name": "root",
+        "slug": "root",
+        "children": [
+          {
+            "name": "Main Project",
+            "slug": "main_project",
+            "children": [
+              {
+                "name": "home",
+                "slug": "home",
+                "children": [
+                  {
+                    "name": "Welcome",
+                    "type": "dialog",
+                    "slug": "welcome_1",
+                    "children": []
+                  },
+                  {
+                    "name": "Parameters",
+                    "type": "sidepanel",
+                    "slug": "parameters_1",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "theme.classic": {
+      "literal": "NOT_ALLOWED"
+    }
+  },
+  "pages/home": {
+    "aimms.widget.type": {
+      "literal": "page"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Overview",
+          "layoutInfo": {
+            "width": "7",
+            "height": "4",
+            "customPosition": ""
+          }
+        },
+        {
+          "uri": "Number of routes",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1450",
+              "y": "450"
+            }
+          }
+        },
+        {
+          "uri": "TotalCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1450",
+              "y": "260"
+            }
+          }
+        },
+        {
+          "uri": "Locations",
+          "layoutInfo": {
+            "width": "4",
+            "height": "4",
+            "customPosition": "checked",
+            "pos": {
+              "x": "20",
+              "y": "30"
+            }
+          }
+        },
+        {
+          "uri": "CostsBreakdown",
+          "layoutInfo": {
+            "width": "3",
+            "height": "3",
+            "customPosition": "checked",
+            "pos": {
+              "x": "400",
+              "y": "740"
+            }
+          }
+        },
+        {
+          "uri": "Costs",
+          "layoutInfo": {
+            "width": "3",
+            "height": "3",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "740"
+            }
+          }
+        },
+        {
+          "uri": "MaximumRunningTime",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1450",
+              "y": "70"
+            }
+          }
+        },
+        {
+          "uri": "Optimize",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1450",
+              "y": "20"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "pages/parameters_1": {
+    "aimms.widget.type": {
+      "literal": "sidepanel"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "TimeHorizon",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "Fixed Hiring Cost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "OvertimeCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "TravelTimeCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "Reliability",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "MeanServiceTime",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/welcome_1": {
+    "aimms.widget.type": {
+      "literal": "dialog"
+    },
+    "maxcolumns": {
+      "literal": 8
+    },
+    "maxrows": {
+      "literal": 3
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Help",
+          "layoutInfo": {
+            "width": "12",
+            "height": "3",
+            "customPosition": ""
+          }
+        }
+      ]
+    }
+  },
+  "widgets/Costs": {
+    "aimms.widget.type": {
+      "literal": "barchart"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "ExpectedOvertimeCost",
+          "ExpectedTravelTimeCost",
+          "HiringCost"
+        ]
+      }
+    },
+    "name": {
+      "literal": "Costs"
+    },
+    "title": {
+      "literal": "Sizing, assingment, and routing costs"
+    }
+  },
+  "widgets/CostsBreakdown": {
+    "aimms.widget.type": {
+      "literal": "piechart"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "ExpectedOvertimeCost",
+          "ExpectedTravelTimeCost",
+          "HiringCost"
+        ]
+      }
+    },
+    "name": {
+      "literal": "CostsBreakdown"
+    },
+    "title": {
+      "literal": "Costs breakdown"
+    }
+  },
+  "widgets/Fixed Hiring Cost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "FixedCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 1000
+    },
+    "min": {
+      "literal": 100
+    },
+    "name": {
+      "literal": "Fixed Hiring Cost"
+    },
+    "step": {
+      "literal": 50
+    },
+    "title": {
+      "literal": "Fixed Hiring Cost ($)"
+    }
+  },
+  "widgets/Help": {
+    "aimms.widget.type": {
+      "literal": "text"
+    },
+    "contents": {
+      "literal": "<div style=\"text-align: center;\"><img src=\"http://localhost:53062/app-resources/resources/images/Logos.png\"></div><div style=\"text-align: center;\"><b style=\"color: rgb(68, 68, 68); font-size: 32px;\">13th AIMMS-MOPTA Optimization Modeling Competition</b></div><div><br></div><div><span style=\"font-size: 18px;\">Welcome to the decision-support tool developped by</span><i style=\"font-size: 18px;\">&nbsp;<b><span style=\"color: rgb(0, 102, 204);\">the Optimistics</span></b></i><span style=\"font-size: 18px;\">. In this application, you can solve the <span style=\"color: rgb(0, 102, 204);\"><b>Home Service Assingment, Routing, and Scheduling (H-SARA)</b></span> in practical time.&nbsp; Please refer to the following video for a quick start on the use of the application:</span></div><div><br></div><div><span style=\"font-size: 18px;\">¡Enjoy!</span></div>"
+    },
+    "name": {
+      "literal": "Help"
+    }
+  },
+  "widgets/Locations": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "XCoordinate",
+          "YCoordinate",
+          "AppointmentTime"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 2
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "l"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "rowHeader",
+          "colKey": "l",
+          "width": 21.45
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "AppointmentTime"
+          },
+          "width": 34.53
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "YCoordinate"
+          },
+          "width": 34.14
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "XCoordinate"
+          },
+          "width": 30.87
+        }
+      ]
+    },
+    "name": {
+      "literal": "Locations"
+    },
+    "title": {
+      "literal": "Locations and scheduling"
+    }
+  },
+  "widgets/MaximumRunningTime": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "MaximumRunningTime"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 1800
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "MaximumRunningTime"
+    },
+    "step": {
+      "literal": 10
+    },
+    "title": {
+      "literal": "Maximum running time (seconds)"
+    }
+  },
+  "widgets/MeanServiceTime": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "MeanServiceTime"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 100
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "MeanServiceTime"
+    },
+    "step": {
+      "literal": 5
+    },
+    "title": {
+      "literal": "Mean service time (min)"
+    }
+  },
+  "widgets/Number of routes": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "NumberOfRoutes"
+        ]
+      }
+    },
+    "contents.displaydomain": {
+      "literal": {
+        "numberofroutes": "Number of routes"
+      }
+    },
+    "contents.labels.visible": {
+      "literal": 0
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "Number of routes"
+    },
+    "title": {
+      "literal": "Number of routes"
+    }
+  },
+  "widgets/Number of teams/routes": {
+    "contents.displaydomain": {
+      "literal": {
+        "numberofroutes": "Number of routes"
+      }
+    },
+    "title": {
+      "literal": "Number of teams/routes"
+    }
+  },
+  "widgets/Optimize": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "prHSARA"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "Optimize"
+    },
+    "title": {
+      "literal": "Optimize"
+    }
+  },
+  "widgets/OvertimeCost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "OvertimeCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 20
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "OvertimeCost"
+    },
+    "step": {
+      "literal": 1
+    },
+    "title": {
+      "literal": "Unit Overtime Cost ($)"
+    }
+  },
+  "widgets/Overview": {
+    "aimms.widget.type": {
+      "literal": "map-v2"
+    },
+    "arcs.__display_order__": {
+      "literal": [
+        "arcs.0"
+      ]
+    },
+    "arcs.0": {
+      "aimms": {
+        "contents": [
+          "Arcs"
+        ],
+        "slices": [
+          {
+            "identifier": "Arcs",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              },
+              {
+                "index": "u",
+                "type": "free",
+                "value": "u"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "arcs.0.label.hide": {
+      "literal": true
+    },
+    "arcs.0.line.straight": {
+      "literal": true
+    },
+    "arcs.0.value": {
+      "literal": {
+        "identifier": "Arcs",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          },
+          {
+            "index": "u",
+            "type": "free",
+            "value": "u"
+          }
+        ]
+      }
+    },
+    "arcs.0.width.dynamic": {
+      "literal": false
+    },
+    "center.latitude": {
+      "literal": 40.36921760249394
+    },
+    "center.longitude": {
+      "literal": -75.28674294556179
+    },
+    "name": {
+      "literal": "Overview"
+    },
+    "nodes.__display_order__": {
+      "literal": [
+        "nodes.0"
+      ]
+    },
+    "nodes.0": {
+      "aimms": {
+        "contents": [
+          "YCoordinate",
+          "XCoordinate",
+          "NodeSize",
+          "FactoriesIcons"
+        ],
+        "slices": [
+          {
+            "identifier": "YCoordinate",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "XCoordinate",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "NodeSize",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "FactoriesIcons",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nodes.0.icon": {
+      "literal": {
+        "identifier": "FactoriesIcons",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.index": {
+      "literal": {
+        "identifier": "l"
+      }
+    },
+    "nodes.0.latitude": {
+      "literal": {
+        "identifier": "XCoordinate",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.longitude": {
+      "literal": {
+        "identifier": "YCoordinate",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.size": {
+      "literal": {
+        "identifier": "NodeSize",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "title": {
+      "literal": "Overview"
+    },
+    "zoom": {
+      "literal": 10
+    }
+  },
+  "widgets/Reliability": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "Alpha"
+        ]
+      }
+    },
+    "max": {
+      "literal": 1
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "Reliability"
+    },
+    "step": {
+      "literal": 0.05
+    },
+    "title": {
+      "literal": "On-time arrival probability"
+    }
+  },
+  "widgets/TimeHorizon": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "TimeHorizon"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 800
+    },
+    "min": {
+      "literal": 50
+    },
+    "name": {
+      "literal": "TimeHorizon"
+    },
+    "step": {
+      "literal": 10
+    },
+    "title": {
+      "literal": "Time Horizon (in minutes)"
+    }
+  },
+  "widgets/TotalCost": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "TotalCost"
+        ]
+      }
+    },
+    "contents.labels.visible": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "TotalCost"
+    },
+    "title": {
+      "literal": "Total Cost"
+    }
+  },
+  "widgets/TravelTimeCost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "TravelTimeCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 20
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "TravelTimeCost"
+    },
+    "step": {
+      "literal": 1
+    },
+    "title": {
+      "literal": "Unit Travel Time Cost ($)"
+    }
+  }
+}

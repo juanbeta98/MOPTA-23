@@ -1,0 +1,437 @@
+## ams_version=1.0
+
+Model Main_Optimistics_App {
+	Section List_Group_and_Items {
+		StringParameter MyListGroupItems {
+			IndexDomain: (webui::indexListGroupOrder,webui::indexNoOfListItems,webui::indexListGroupItemsSpec);
+		}
+		StringParameter MyListsGroups {
+			IndexDomain: (webui::indexListGroupOrder,webui::indexListGroupSpec);
+		}
+	}
+	DeclarationSection Declaration_Optimization_Data {
+		StringParameter RouteSequence {
+			IndexDomain: r;
+			Comment: "Sequence of nodes for each route";
+		}
+		StringParameter Route {
+			IndexDomain: l;
+			Comment: "Route that vists each node";
+		}
+		ElementParameter RouteOfNode {
+			IndexDomain: l;
+			Range: RouteNumber;
+			Comment: "Route that vists each node";
+		}
+		Set Routes {
+			IndexDomain: r;
+			SubsetOf: Locations;
+			Comment: "Set of routes";
+		}
+		Parameter RouteCost {
+			IndexDomain: r;
+			Comment: "Expected cost of each route";
+		}
+		Parameter RouteTime {
+			IndexDomain: r;
+			Comment: "Expected time of each route";
+		}
+		Set RouteNumber {
+			Index: r;
+			Comment: "Number of each route";
+			webui::AnnotationsIdentifier: LegendAnnotation;
+		}
+		StringParameter AppointmentTime {
+			IndexDomain: l;
+			Comment: "Appointment time of each customer";
+		}
+		Parameter Arcs {
+			IndexDomain: (l,u);
+			Comment: {
+				"Arcs of the graph (1 if the arc is part of the solution; 0 otherwise)"
+			}
+			webui::AnnotationsIdentifier: ;
+		}
+		Parameter TotalCost {
+			Range: nonnegative;
+			Comment: "Total cost";
+		}
+		Parameter ExpectedOvertimeCost {
+			Range: nonnegative;
+			Comment: "Expected overtime cost";
+			webui::AnnotationsIdentifier: MaroonColor;
+		}
+		Parameter ExpectedTravelTimeCost {
+			Range: nonnegative;
+			Comment: "Expected travel time cost";
+			webui::AnnotationsIdentifier: GreenColor;
+		}
+		Parameter HiringCost {
+			Range: nonnegative;
+			Comment: "Hiring cost";
+			webui::AnnotationsIdentifier: PurpleColor;
+		}
+		Parameter NumberOfRoutes {
+			Range: integer;
+			Comment: "Number of routes given by the solution";
+		}
+	}
+	DeclarationSection Map_Declarations {
+		StringParameter PurpleColor {
+			Definition: 'purple';
+			Comment: "Purple color";
+		}
+		StringParameter MaroonColor {
+			Definition: "navy";
+			Comment: "Maroon color";
+		}
+		StringParameter GreenColor {
+			Definition: 'green';
+			Comment: "Green color";
+		}
+		StringParameter LegendAnnotation {
+			IndexDomain: r;
+			Definition: routeColor(r);
+			Comment: "Map legend";
+		}
+		ElementParameter AuxMap {
+			Range: RouteNumber;
+			Comment: "AuxMap";
+		}
+		StringParameter parametersSP {
+			IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
+		}
+		Set MyActions;
+		ElementParameter SelectedCustomer {
+			Range: Locations;
+			Comment: "Selected customer in the map";
+		}
+		StringParameter RouteColor {
+			IndexDomain: r;
+			Comment: "Route color";
+		}
+		StringParameter NodesColor {
+			IndexDomain: l;
+			Definition: {
+				RouteColor(RouteOfNode(l));
+			}
+			Comment: "Color of each node according to the route";
+		}
+		StringParameter ArcsTooltip {
+			IndexDomain: (l,u);
+		}
+		StringParameter FactoriesIcons {
+			IndexDomain: l;
+			Comment: "Icons for each node in the map";
+		}
+		StringParameter NodesTooltip {
+			IndexDomain: l;
+		}
+	}
+	Procedure prHSARA {
+		Body: {
+			prWriteJSON;
+			prCallAPI;
+			if pResponseCode = 200 then
+			spWarning := FormatString("Called %s", spURL);
+			endif;
+			ReadPythonData;
+			!FileDelete(spOutFile);
+		}
+		Comment: "Run the H-SARA problem in python";
+	}
+	Section DataIO {
+		DeclarationSection jsonIO {
+			StringParameter spInFile {
+				InitialData: "clustOutput.json";
+			}
+			StringParameter spOutFile {
+				InitialData: "pretty.json";
+			}
+			StringParameter spMapFile {
+				InitialData: "apiCalls//outMap.xml";
+			}
+			StringParameter spMapName {
+				InitialData: "coordinates";
+			}
+		}
+		Procedure prWriteJSON {
+			Body: {
+				spOutFile := "input.json";
+				spMapName := "outMap";
+				spMapFile := "apiCalls//outMap.xml";
+				
+				dex::AddMapping(
+					mappingName : spMapName , 
+					mappingFile : spMapFile );
+				
+				dex::WriteToFile(
+					dataFile    : spOutFile , 
+					mappingName : spMapName , 
+					pretty      :  1);
+			}
+			Comment: "Write the input information (interface)";
+		}
+		DeclarationSection apiCall {
+			StringParameter spRequestHeaders {
+				IndexDomain: web::httpHeader;
+			}
+			Parameter pResponseCode;
+			StringParameter spBody;
+			StringParameter spResponseFile;
+			StringParameter spURL {
+				InitialData: "http://localhost:8000/";
+			}
+			StringParameter spReqID;
+		}
+		Procedure prCallAPI {
+			Body: {
+				block
+				!starting request
+				web::request_create(requestId : spReqID );
+				web::request_setURL(spReqID, spURL);
+				web::request_setMethod(spReqID, "GET");
+				!as we want to send data in a file. Set 2nd argument to 'None' if you only need to pass a scalar value
+				web::request_setRequestBody(spReqID, 'File', spOutFile);
+				!as we want to send a json file and default expectation is a txt file
+				web::request_getHeaders(spReqID, spRequestHeaders);
+				spRequestHeaders['Content-Type'] := "application/json";
+				web::request_setHeaders(spReqID, spRequestHeaders);
+				web::request_setResponseBody(spReqID, 'File', spInFile);
+				!call the api
+				web::request_invoke(spReqID, pResponseCode);
+				web::request_close(spReqID);
+				
+				onerror epErr do
+					spWarning := "Make sure your api server is running";
+					!errh::Message(epErr);
+					errh::MarkAsHandled(epErr);
+				endblock;
+			}
+		}
+	}
+	DeclarationSection Declaration_Input_Data {
+		ElementParameter SolutionMethod {
+			Range: PossibleMethods;
+		}
+		Set PossibleMethods {
+			Definition: DATA{'Exact Method', 'Heuristic Method' };
+		}
+		Parameter MaximumRunningTime;
+		Set PossibleDepartureMinutes {
+			Index: m;
+			InitialData: {
+				DATA {00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59};
+			}
+		}
+		ElementParameter DepartureHour {
+			Range: PossibleDepartureHours;
+		}
+		ElementParameter DepartureMinute {
+			Range: PossibleDepartureMinutes;
+		}
+		Set PossibleDepartureHours {
+			Index: h;
+			InitialData: {
+				DATA {00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+			}
+		}
+		Parameter CancellationProbability {
+			IndexDomain: l;
+		}
+		Parameter NumberOfCustomers {
+			Range: integer;
+			InitialData: 20;
+			Comment: "Number of customers";
+		}
+		Parameter GenerateRandomInstance {
+			Range: integer;
+			Comment: "1: generate a random instance, 0: optimize according to the button";
+		}
+		StringParameter spTableName {
+			Definition: {
+				if SelectedCustomer then
+				FormatString("Customer-%e", SelectedCustomer)
+				else
+				"Click on a customer locations"
+				endif
+			}
+			Comment: "Customer information table";
+		}
+		Parameter MeanServiceTime {
+			InitialData: 45;
+			Comment: "Mean service time";
+		}
+		StringParameter spWarning {
+			InitialData: "Click on Locations";
+		}
+		ElementParameter epErr {
+			Range: errh::PendingErrors;
+		}
+		Set Locations {
+			Index: l, u;
+			Comment: "Locations";
+			webui::AnnotationsIdentifier: NodesColor;
+			webui::TooltipIdentifier: NodesTooltip;
+		}
+		Parameter NodeSize {
+			IndexDomain: l;
+			Comment: "Size of each node";
+			webui::TooltipIdentifier: NodesTooltip;
+		}
+		Parameter XCoordinate {
+			IndexDomain: l;
+			Comment: "x coordinate";
+		}
+		Parameter YCoordinate {
+			IndexDomain: l;
+			Comment: "y coordinate";
+		}
+		Parameter TimeHorizon {
+			InitialData: 250;
+			Comment: "Time horizon";
+		}
+		Parameter FixedCost {
+			InitialData: 100;
+			Comment: "Fixed cost";
+		}
+		Parameter OvertimeCost {
+			InitialData: 2;
+			Comment: "Overtime cost";
+		}
+		Parameter TravelTimeCost {
+			InitialData: 1;
+			Comment: "Travel time cost";
+		}
+		Parameter Alpha {
+			InitialData: 0.5;
+			Comment: "Desired probability of on-time arrival";
+		}
+	}
+	Procedure RandomInstance {
+		Body: {
+			GenerateRandomInstance := 1;
+			prHSARA;
+			GenerateRandomInstance := 0;
+		}
+		Comment: "Generate a random instance";
+	}
+	Procedure ReadPythonData {
+		Body: {
+			read from file "output.txt";
+		}
+		Comment: "Read the solution of the python script (with the solution of the H-SARA problem or the random instance)";
+	}
+	Procedure WelcomePage {
+		Body: {
+			MyActions:= data { Decline, Accept };
+			webui::OpenDialogPage('welcome_1', "Dialog Page Title", MyActions, 'Procedure_Actions');
+		}
+		Comment: "Welcome page";
+	}
+	Procedure MainInitialization {
+		Comment: "Main initialization";
+	}
+	Procedure PostMainInitialization {
+		Body: {
+			spURL := "http://localhost:8000/";
+		}
+		Comment: {
+			"Add initialization statements here that require that the libraries are already initialized properly,
+			or add statements that require the Data Management module to be initialized."
+		}
+	}
+	Procedure MainExecution;
+	Procedure PreMainTermination {
+		Body: {
+			return DataManagementExit();
+		}
+		Comment: "PreMain termination";
+	}
+	Procedure MainTermination {
+		Body: {
+			return 1;
+		}
+		Comment: "Main termination";
+	}
+	Procedure UploadProcedure {
+		Arguments: (UploadFileName,statusCode,statusDescription);
+		Body: {
+			statusCode := webui::ReturnStatusCode('OK');
+			statusDescription := FormatString("File was uploaded and data was imported");
+			
+			InputFileName := webui::GetIOFilePath(UploadFileName);
+			
+			ReadExcelFile;
+			
+			FileDelete(webui::GetIOFilePath(UploadFileName));
+			
+			GenerateRandomInstance := 2;
+			prHSARA;
+			GenerateRandomInstance := 0;
+		}
+		StringParameter UploadFileName {
+			Property: InOut;
+		}
+		Parameter statusCode {
+			Property: Output;
+		}
+		StringParameter statusDescription {
+			Property: Output;
+		}
+	}
+	Section Excel_Section {
+		Parameter pRowNum;
+		StringParameter InputFileName;
+		Procedure ReadExcelFile {
+			Body: {
+				axll::OpenWorkBook(InputFileName);
+				
+				axll::SelectSheet(SheetName : "Data");
+				
+				pRowNum := axll::LastUsedRowNumber;
+				NumberOfCustomers := pRowNum-2;
+				
+				axll::ReadList(
+					IdentifierReference	: XCoordinate(l),
+					RowHeaderRange		: FormatString("A2:A%n", pRowNum),
+					DataRange		: FormatString("B2:B%n", pRowNum),
+					ModeForUnknownElements	: 1,
+					MergeWithExistingData	: 0);
+				
+				axll::ReadList(
+					IdentifierReference	: YCoordinate(l),
+					RowHeaderRange		: FormatString("A2:A%n", pRowNum),
+					DataRange		: FormatString("C2:C%n", pRowNum),
+					ModeForUnknownElements	: 1,
+					MergeWithExistingData	: 0);
+				
+				axll::ReadList(
+					IdentifierReference	: CancellationProbability(l),
+					RowHeaderRange		: FormatString("A2:A%n", pRowNum),
+					DataRange		: FormatString("D2:D%n", pRowNum),
+					ModeForUnknownElements	: 1,
+					MergeWithExistingData	: 0);
+				
+				axll::CloseAllWorkBooks;
+			}
+		}
+	}
+	Section Quantities_and_Units {
+		Comment: {
+			"This section contains all the units and quantities that are added automatically by AIMMS.
+			It is recommended to declare all your quantities here."
+		}
+		Quantity SI_Time_Duration {
+			BaseUnit: s;
+			Conversions: minute->s : #-># * 60;
+			Comment: {
+				"Expresses the value for the duration of periods.
+				
+				The unit s has been added automatically because it is a required unit for AimmsWebUI.
+				
+				The unit minute has been added automatically because it is a required unit for AimmsWebUI."
+			}
+		}
+	}
+}

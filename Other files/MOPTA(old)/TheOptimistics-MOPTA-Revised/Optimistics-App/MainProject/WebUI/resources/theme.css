@@ -1,0 +1,55 @@
+html.theme-aimms {
+  background: rgb(249,249,249) url("images/background.png") no-repeat fixed;
+  background-size: cover;
+}
+.theme-aimms .app-section {
+  color: #fff;
+}
+.theme-aimms .widgetdiv {
+  border-radius: 5px;
+}
+.theme-aimms .tag-textwidget {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.theme-aimms .tag-image{
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-aimms .widgetdiv.active-widget {
+  box-shadow: 0px 0px 20px #B9B9B9;
+}
+.theme-aimms .aimms-widget > .ui-button {
+  background-color: #6fabb0;
+  color: #fff;
+  font-size: 200%;
+}
+.theme-aimms .aimms-widget > .ui-button:hover {
+  background-color: #b7d5d8;
+  color: #fff;
+  font-size: 200%;
+}
+.theme-aimms .awf-dock.top.vbox {
+  border-radius: 5px 5px 0 0;
+  background-color: #b7d5d8 !important;
+}  
+.theme-aimms .title-addon {
+  color: black;
+}
+.theme-aimms .widgetdiv:not(.widgetdiv-noborder):not(.offline):hover .chrome-button,
+.theme-aimms .widgetdiv:not(.widgetdiv-noborder):not(.offline) .chrome-button.open,
+.theme-aimms .widgetdiv:not(.widgetdiv-noborder):not(.offline) .chrome-button {
+  background-color: transparent;
+  box-shadow: none;
+}
+.theme-aimms .tag-label > .label {
+  border-radius: 5px;
+  background: black;
+  color: #fff;
+}
+.theme-aimms .rowHeader-table tr td:last-child,
+.theme-aimms .colHeader-table tr:last-child {
+  background-color: black;
+}
+.theme-aimms .chart.vbox {
+  background-color: transparent;
+}

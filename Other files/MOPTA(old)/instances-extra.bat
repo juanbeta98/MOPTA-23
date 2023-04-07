@@ -1,0 +1,10 @@
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50
+python experiments(heuristic).py 50

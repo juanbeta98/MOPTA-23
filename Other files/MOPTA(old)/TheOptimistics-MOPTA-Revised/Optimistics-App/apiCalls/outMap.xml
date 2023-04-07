@@ -1,0 +1,25 @@
+<AimmsJSONMapping>
+    <ObjectMapping>
+	<ValueMapping name="maxTime" maps-to="TimeHorizon"/>
+	<ValueMapping name="costFixed" maps-to="FixedCost"/>
+	<ValueMapping name="costTime" maps-to="TravelTimeCost"/>
+	<ValueMapping name="costOvertime" maps-to="OvertimeCost"/>
+	<ValueMapping name="alpha" maps-to="Alpha"/>
+	<ValueMapping name="serviceTime" maps-to="MeanServiceTime"/>
+	<ValueMapping name="RamdonInstance" maps-to="GenerateRandomInstance"/>
+	<ValueMapping name="numCustomers" maps-to="NumberOfCustomers"/>
+        <ArrayMapping name="latitude">
+            <ValueMapping iterative-binds-to="l" maps-to="XCoordinate(l)" dense-write="XCoordinate(l)"/>
+        </ArrayMapping>
+        <ArrayMapping name="longitude">
+            <ValueMapping iterative-binds-to="l" maps-to="YCoordinate(l)" dense-write="YCoordinate(l)"/>
+        </ArrayMapping>
+	<ArrayMapping name="probability">
+            <ValueMapping iterative-binds-to="l" maps-to="CancellationProbability(l)" dense-write="CancellationProbability(l)"/>
+        </ArrayMapping>
+	<ValueMapping name="hour" maps-to="DepartureHour"/>
+	<ValueMapping name="minute" maps-to="DepartureMinute"/>
+	<ValueMapping name="tmax" maps-to="MaximumRunningTime"/>
+	<ValueMapping name="sol_method" maps-to="SolutionMethod"/>
+    </ObjectMapping>
+</AimmsJSONMapping>

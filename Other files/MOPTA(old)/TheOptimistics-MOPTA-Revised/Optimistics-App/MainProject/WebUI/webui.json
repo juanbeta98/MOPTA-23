@@ -1,0 +1,1457 @@
+{
+  "version": "4.67.0",
+  "application": {
+    "aimms.widget.type": {
+      "literal": "application"
+    },
+    "pages": {
+      "literal": {
+        "name": "root",
+        "slug": "root",
+        "children": [
+          {
+            "name": "Main Project",
+            "slug": "main_project",
+            "children": [
+              {
+                "name": "welcome",
+                "type": "page",
+                "slug": "welcome_2",
+                "children": []
+              },
+              {
+                "name": "home",
+                "slug": "home",
+                "children": [
+                  {
+                    "name": "Parameters",
+                    "type": "sidepanel",
+                    "slug": "parameters_1",
+                    "children": []
+                  },
+                  {
+                    "name": "Help",
+                    "type": "sidepanel",
+                    "slug": "help_1",
+                    "children": []
+                  },
+                  {
+                    "name": "Legend",
+                    "type": "sidepanel",
+                    "slug": "legend_1",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "theme.classic": {
+      "literal": "NOT_ALLOWED"
+    }
+  },
+  "pages/help_1": {
+    "aimms.widget.type": {
+      "literal": "sidepanel"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Help-Text",
+          "layoutInfo": {
+            "width": "2",
+            "height": "4",
+            "customPosition": ""
+          }
+        },
+        {
+          "uri": "Button-Demo-Video",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "0",
+              "y": "0"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "pages/home": {
+    "aimms.widget.type": {
+      "literal": "page"
+    },
+    "sidepanels": {
+      "aimms": {
+        "contents": [
+          "parametersSP"
+        ],
+        "slices": [
+          {
+            "identifier": "parametersSP",
+            "slice": [
+              {
+                "index": "webui::indexPageExtension",
+                "type": "free",
+                "value": "webui::indexPageExtension"
+              },
+              {
+                "index": "webui::indexSidePanelSpec",
+                "type": "free",
+                "value": "webui::indexSidePanelSpec"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Data File",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "450"
+            }
+          }
+        },
+        {
+          "uri": "Upload Data",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "500"
+            }
+          }
+        },
+        {
+          "uri": "Title Hous",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "250"
+            }
+          }
+        },
+        {
+          "uri": "Title Minutes",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "350"
+            }
+          }
+        },
+        {
+          "uri": "Departure Hour",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "300"
+            }
+          }
+        },
+        {
+          "uri": "Departure Minute",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "400"
+            }
+          }
+        },
+        {
+          "uri": "logo",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "60"
+            }
+          }
+        },
+        {
+          "uri": "CustomersInformation",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "550"
+            }
+          }
+        },
+        {
+          "uri": "Overview",
+          "layoutInfo": {
+            "width": "8",
+            "height": "3",
+            "customPosition": "checked",
+            "pos": {
+              "x": "400",
+              "y": "10"
+            }
+          }
+        },
+        {
+          "uri": "Routes",
+          "layoutInfo": {
+            "width": "4",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "400",
+              "y": "550"
+            }
+          }
+        },
+        {
+          "uri": "Number of routes",
+          "layoutInfo": {
+            "width": "3",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "730"
+            }
+          }
+        },
+        {
+          "uri": "Locations",
+          "layoutInfo": {
+            "width": "5",
+            "height": "3",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1440",
+              "y": "370"
+            }
+          }
+        },
+        {
+          "uri": "CostsBreakdown",
+          "layoutInfo": {
+            "width": "5",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1440",
+              "y": "10"
+            }
+          }
+        },
+        {
+          "uri": "Costs",
+          "layoutInfo": {
+            "width": "4",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "920",
+              "y": "550"
+            }
+          }
+        },
+        {
+          "uri": "Optimize",
+          "layoutInfo": {
+            "width": "3",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "10",
+              "y": "10"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "pages/legend_1": {
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Legend",
+          "layoutInfo": {
+            "width": "2",
+            "height": "4"
+          }
+        }
+      ]
+    },
+    "aimms.widget.type": {
+      "literal": "sidepanel"
+    }
+  },
+  "pages/parameters_1": {
+    "aimms.widget.type": {
+      "literal": "sidepanel"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "Solution method",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "Runtime limit",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1",
+            "customPosition": ""
+          }
+        },
+        {
+          "uri": "TimeHorizon",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "Fixed Hiring Cost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "OvertimeCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "TravelTimeCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "Reliability",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "MeanServiceTime",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "NumberOfCustomers",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "ChangeButton",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/welcome_2": {
+    "aimms.widget.type": {
+      "literal": "page"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "DemoButton",
+          "layoutInfo": {
+            "width": "6",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "380",
+              "y": "690"
+            }
+          }
+        },
+        {
+          "uri": "Button",
+          "layoutInfo": {
+            "width": "6",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1160",
+              "y": "690"
+            }
+          }
+        },
+        {
+          "uri": "AIMMS-logo",
+          "layoutInfo": {
+            "width": "4",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "1420",
+              "y": "150"
+            }
+          }
+        },
+        {
+          "uri": "LehighLogo",
+          "layoutInfo": {
+            "width": "4",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "900",
+              "y": "150"
+            }
+          }
+        },
+        {
+          "uri": "UniandesImage",
+          "layoutInfo": {
+            "width": "4",
+            "height": "1",
+            "customPosition": "checked",
+            "pos": {
+              "x": "380",
+              "y": "150"
+            }
+          }
+        },
+        {
+          "uri": "welcome_text",
+          "layoutInfo": {
+            "width": "12",
+            "height": "2",
+            "customPosition": "checked",
+            "pos": {
+              "x": "380",
+              "y": "330"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "widgets/AIMMS-logo": {
+    "aimms.widget.type": {
+      "literal": "image"
+    },
+    "contents": {
+      "literal": "logo-aimms.png"
+    },
+    "name": {
+      "literal": "AIMMS-logo"
+    }
+  },
+  "widgets/Button": {
+    "action": {
+      "literal": {
+        "type": "pageLink",
+        "value": "home",
+        "slug": "home"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "Button"
+    },
+    "title": {
+      "literal": "Take me to the application!"
+    }
+  },
+  "widgets/Button-Demo-Video": {
+    "action": {
+      "literal": {
+        "type": "externalLink",
+        "value": "https://www.youtube.com/watch?v=i1JPhwEwp04&ab_channel=DanielYamin"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "Button-Demo-Video"
+    },
+    "title": {
+      "literal": "Watch demo video"
+    }
+  },
+  "widgets/ChangeButton": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "RandomInstance"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "ChangeButton"
+    },
+    "title": {
+      "literal": "Update"
+    }
+  },
+  "widgets/Costs": {
+    "aimms.widget.type": {
+      "literal": "barchart"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "ExpectedOvertimeCost",
+          "ExpectedTravelTimeCost",
+          "HiringCost"
+        ]
+      }
+    },
+    "name": {
+      "literal": "Costs"
+    },
+    "title": {
+      "literal": "Sizing, assingment, and routing costs"
+    }
+  },
+  "widgets/CostsBreakdown": {
+    "aimms.widget.type": {
+      "literal": "piechart"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "ExpectedOvertimeCost",
+          "ExpectedTravelTimeCost",
+          "HiringCost"
+        ]
+      }
+    },
+    "name": {
+      "literal": "CostsBreakdown"
+    },
+    "title": {
+      "literal": "Costs breakdown"
+    }
+  },
+  "widgets/CustomersInformation": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "contents": {
+      "aimms": {
+        "slices": [
+          {
+            "identifier": "Route",
+            "slice": [
+              {
+                "index": "l",
+                "type": "element-parameter",
+                "value": "SelectedCustomer"
+              }
+            ]
+          },
+          {
+            "identifier": "AppointmentTime",
+            "slice": [
+              {
+                "index": "l",
+                "type": "element-parameter",
+                "value": "SelectedCustomer"
+              }
+            ]
+          }
+        ],
+        "contents": [
+          "SelectedCustomer",
+          "AppointmentTime",
+          "Route"
+        ],
+        "prefix": "aimms"
+      }
+    },
+    "name": {
+      "literal": "CustomersInformation"
+    },
+    "title": {
+      "aimms": {
+        "contents": [
+          "spTableName"
+        ],
+        "slices": []
+      }
+    }
+  },
+  "widgets/Data File": {
+    "aimms.widget.type": {
+      "literal": "label"
+    },
+    "contents": {
+      "literal": "Data File"
+    },
+    "name": {
+      "literal": "Data File"
+    },
+    "widget.visible": {
+      "literal": 1
+    }
+  },
+  "widgets/DemoButton": {
+    "action": {
+      "literal": {
+        "type": "externalLink",
+        "value": "https://www.youtube.com/watch?v=i1JPhwEwp04&ab_channel=DanielYamin"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "DemoButton"
+    },
+    "title": {
+      "literal": "Let me see that demo video"
+    }
+  },
+  "widgets/Departure Hour": {
+    "aimms.widget.type": {
+      "literal": "selectionbox"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "DepartureHour"
+        ]
+      }
+    },
+    "name": {
+      "literal": "Departure Hour"
+    }
+  },
+  "widgets/Departure Minute": {
+    "aimms.widget.type": {
+      "literal": "selectionbox"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "DepartureMinute"
+        ]
+      }
+    },
+    "name": {
+      "literal": "Departure Minute"
+    }
+  },
+  "widgets/Fixed Hiring Cost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "FixedCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 1000
+    },
+    "min": {
+      "literal": 100
+    },
+    "name": {
+      "literal": "Fixed Hiring Cost"
+    },
+    "step": {
+      "literal": 50
+    },
+    "title": {
+      "literal": "Fixed hiring cost ($)"
+    },
+    "widget.visible": {
+      "literal": 1
+    }
+  },
+  "widgets/Help-Text": {
+    "aimms.widget.type": {
+      "literal": "text"
+    },
+    "contents": {
+      "literal": "<div>Here you find a brief description of the main functionalities presented in the home page.</div><div><br></div><div><i><b>1. Overview:</b></i> shows the locations of interest. </div><div><br></div><div><b><i>2. Locations and scheduling:</i></b> presents the most relevant information of each location of interest.&nbsp;</div><div><br></div><div><b><i>3. Sizing, assignment, and routing costs +&nbsp; Costs breakdown:</i></b> describe the costs according to the current solution.</div><div><br></div><div><b><i>4. Routes information:</i></b> resumes the information regarding the routes/teams.&nbsp;</div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div>"
+    },
+    "name": {
+      "literal": "Help-Text"
+    }
+  },
+  "widgets/Legend": {
+    "aimms.widget.type": {
+      "literal": "legend"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "AuxMap"
+        ]
+      }
+    },
+    "contents.displaydomain": {
+      "literal": {
+        "routecolor": "r"
+      }
+    },
+    "name": {
+      "literal": "Legend"
+    },
+    "title": {
+      "literal": "Route number and color"
+    }
+  },
+  "widgets/LehighLogo": {
+    "aimms.widget.type": {
+      "literal": "image"
+    },
+    "contents": {
+      "literal": "lehigh-logo.png"
+    },
+    "name": {
+      "literal": "LehighLogo"
+    }
+  },
+  "widgets/Locations": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "XCoordinate",
+          "YCoordinate",
+          "CancellationProbability",
+          "AppointmentTime",
+          "RouteOfNode"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 2
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "l"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "rowHeader",
+          "colKey": "l",
+          "width": 26.08
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "RouteOfNode"
+          },
+          "width": 24.69
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "XCoordinate"
+          },
+          "width": 21.26
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "YCoordinate"
+          },
+          "width": 20.92
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "CancellationProbability"
+          },
+          "width": 35.9
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "AppointmentTime"
+          },
+          "width": 28.28
+        }
+      ]
+    },
+    "name": {
+      "literal": "Locations"
+    },
+    "title": {
+      "literal": "Locations and scheduling"
+    }
+  },
+  "widgets/logo": {
+    "aimms.widget.type": {
+      "literal": "image"
+    },
+    "contents": {
+      "literal": "logo.png"
+    },
+    "name": {
+      "literal": "logo"
+    }
+  },
+  "widgets/MeanServiceTime": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "MeanServiceTime"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 100
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "MeanServiceTime"
+    },
+    "step": {
+      "literal": 5
+    },
+    "title": {
+      "literal": "Mean service time (min)"
+    }
+  },
+  "widgets/Number of routes": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "NumberOfRoutes",
+          "TotalCost"
+        ]
+      }
+    },
+    "contents.displaydomain": {
+      "literal": {
+        "numberofroutes": "Number of routes"
+      }
+    },
+    "contents.labels.visible": {
+      "literal": 1
+    },
+    "contents.numdecimals": {
+      "literal": 2
+    },
+    "name": {
+      "literal": "Number of routes"
+    },
+    "title": {
+      "literal": "Summary"
+    }
+  },
+  "widgets/NumberOfCustomers": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "NumberOfCustomers"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 50
+    },
+    "min": {
+      "literal": 20
+    },
+    "name": {
+      "literal": "NumberOfCustomers"
+    },
+    "step": {
+      "literal": 10
+    },
+    "title": {
+      "literal": "Number of customers"
+    }
+  },
+  "widgets/Optimize": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "prHSARA"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "Optimize"
+    },
+    "title": {
+      "literal": "Solve"
+    }
+  },
+  "widgets/OvertimeCost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "OvertimeCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 20
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "OvertimeCost"
+    },
+    "step": {
+      "literal": 1
+    },
+    "title": {
+      "literal": "Unit overtime cost ($)"
+    }
+  },
+  "widgets/Overview": {
+    "aimms.widget.type": {
+      "literal": "map-v2"
+    },
+    "arcs.__display_order__": {
+      "literal": [
+        "arcs.0"
+      ]
+    },
+    "arcs.0": {
+      "aimms": {
+        "contents": [
+          "Arcs"
+        ],
+        "slices": [
+          {
+            "identifier": "Arcs",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              },
+              {
+                "index": "u",
+                "type": "free",
+                "value": "u"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "arcs.0.label.hide": {
+      "literal": true
+    },
+    "arcs.0.line.straight": {
+      "literal": true
+    },
+    "arcs.0.value": {
+      "literal": {
+        "identifier": "Arcs",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          },
+          {
+            "index": "u",
+            "type": "free",
+            "value": "u"
+          }
+        ]
+      }
+    },
+    "arcs.0.width.dynamic": {
+      "literal": false
+    },
+    "center.latitude": {
+      "literal": 40.41684198424955
+    },
+    "center.longitude": {
+      "literal": -75.18603414676969
+    },
+    "name": {
+      "literal": "Overview"
+    },
+    "nodes.__display_order__": {
+      "literal": [
+        "nodes.0"
+      ]
+    },
+    "nodes.0": {
+      "aimms": {
+        "contents": [
+          "YCoordinate",
+          "XCoordinate",
+          "NodeSize",
+          "FactoriesIcons"
+        ],
+        "slices": [
+          {
+            "identifier": "YCoordinate",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "XCoordinate",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "NodeSize",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          },
+          {
+            "identifier": "FactoriesIcons",
+            "slice": [
+              {
+                "index": "l",
+                "type": "free",
+                "value": "l"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nodes.0.icon": {
+      "literal": {
+        "identifier": "FactoriesIcons",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.index": {
+      "literal": {
+        "focus": [
+          {
+            "index": "l",
+            "value": "SelectedCustomer"
+          }
+        ],
+        "identifier": "l"
+      }
+    },
+    "nodes.0.latitude": {
+      "literal": {
+        "identifier": "XCoordinate",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.longitude": {
+      "literal": {
+        "identifier": "YCoordinate",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "nodes.0.size": {
+      "literal": {
+        "identifier": "NodeSize",
+        "slice": [
+          {
+            "index": "l",
+            "type": "free",
+            "value": "l"
+          }
+        ]
+      }
+    },
+    "title": {
+      "literal": "Overview"
+    },
+    "zoom": {
+      "literal": 9
+    }
+  },
+  "widgets/Reliability": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "Alpha"
+        ]
+      }
+    },
+    "max": {
+      "literal": 1
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "Reliability"
+    },
+    "step": {
+      "literal": 0.05
+    },
+    "title": {
+      "literal": "On-time arrival probability"
+    }
+  },
+  "widgets/Routes": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "RouteCost",
+          "RouteTime",
+          "RouteSequence"
+        ]
+      }
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "r"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "TotalRoutes"
+          },
+          "width": 33.23
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "Sequences"
+          },
+          "width": 41.71
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "RouteSequence"
+          },
+          "width": 46.65
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "RouteTime"
+          },
+          "width": 27.23
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "RouteCost"
+          },
+          "width": 36.5
+        },
+        {
+          "type": "rowHeader",
+          "colKey": "r",
+          "width": 40.47
+        }
+      ]
+    },
+    "hide.download.button": {
+      "literal": false
+    },
+    "name": {
+      "literal": "Routes"
+    },
+    "title": {
+      "literal": "Routes information"
+    }
+  },
+  "widgets/Runtime limit": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "MaximumRunningTime"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 3600
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "Runtime limit"
+    },
+    "step": {
+      "literal": 10
+    },
+    "title": {
+      "literal": "Maximum running time (s)"
+    }
+  },
+  "widgets/Solution method": {
+    "aimms.widget.type": {
+      "literal": "selectionbox"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "SolutionMethod"
+        ]
+      }
+    },
+    "name": {
+      "literal": "Solution method"
+    }
+  },
+  "widgets/TimeHorizon": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "TimeHorizon"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 800
+    },
+    "min": {
+      "literal": 50
+    },
+    "name": {
+      "literal": "TimeHorizon"
+    },
+    "step": {
+      "literal": 10
+    },
+    "title": {
+      "literal": "Time horizon (min)"
+    }
+  },
+  "widgets/Title Hous": {
+    "aimms.widget.type": {
+      "literal": "label"
+    },
+    "contents": {
+      "literal": "Departure Time Hour"
+    },
+    "name": {
+      "literal": "Title Hous"
+    }
+  },
+  "widgets/Title Minutes": {
+    "aimms.widget.type": {
+      "literal": "label"
+    },
+    "contents": {
+      "literal": "Departure Time Minute"
+    },
+    "name": {
+      "literal": "Title Minutes"
+    },
+    "widget.visible": {
+      "literal": 1
+    }
+  },
+  "widgets/TravelTimeCost": {
+    "aimms.widget.type": {
+      "literal": "slider"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "TravelTimeCost"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "max": {
+      "literal": 20
+    },
+    "min": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "TravelTimeCost"
+    },
+    "step": {
+      "literal": 1
+    },
+    "title": {
+      "literal": "Unit travel time cost ($)"
+    }
+  },
+  "widgets/UniandesImage": {
+    "aimms.widget.type": {
+      "literal": "image"
+    },
+    "contents": {
+      "literal": "logo-uniandes.png"
+    },
+    "name": {
+      "literal": "UniandesImage"
+    }
+  },
+  "widgets/Upload Data": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "UploadProcedure"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "upload"
+    },
+    "name": {
+      "literal": "Upload Data"
+    },
+    "title": {
+      "literal": "Select File from PC"
+    }
+  },
+  "widgets/welcome_text": {
+    "aimms.widget.type": {
+      "literal": "text"
+    },
+    "contents": {
+      "literal": "<div><br></div><div><br></div><div style=\"text-align: center;\"><br></div><div style=\"text-align: center;\"><span style=\"background-color: inherit; font-size: 32px;\"><span style=\"color: rgb(107, 36, 178);\"><b>13th AIMMS-MOPTA Optimization Modeling Competition</b></span></span></div><div><br></div><div><b style=\"background-color: inherit; font-size: 32px;\"><span style=\"color: rgb(255, 255, 255);\">Welcome to the decision-support tool developped by</span></b><b><i style=\"background-color: inherit; font-size: 32px;\"><span style=\"color: rgb(255, 255, 255);\">&nbsp;</span><span style=\"color: rgb(107, 36, 178);\">the Optimistics</span></i></b><b style=\"background-color: inherit; font-size: 32px;\"><span style=\"color: rgb(61, 20, 102);\">. </span><span style=\"color: rgb(255, 255, 255);\">In this application, you can solve the&nbsp;Home Service Assingment, Routing, and Scheduling (H-SARA)&nbsp;in practical time.&nbsp; Please refer to the demo video for a quick start on the use of the application.</span></b></div><div><br></div><div><b style=\"background-color: inherit; font-size: 32px;\"><span style=\"color: rgb(107, 36, 178);\">¡Enjoy!</span></b></div>"
+    },
+    "name": {
+      "literal": "welcome_text"
+    }
+  }
+}

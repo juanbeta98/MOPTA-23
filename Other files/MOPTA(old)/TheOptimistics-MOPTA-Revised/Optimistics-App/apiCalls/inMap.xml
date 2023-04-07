@@ -1,0 +1,13 @@
+<AimmsJSONMapping>
+    <ObjectMapping>
+        <ArrayMapping name="routes">
+            <ValueMapping iterative-binds-to="iLoc,jLoc" iterative-existing="1" maps-to="pArcs(iLoc,jLoc)"/>
+        </ArrayMapping>
+        <ArrayMapping name="costs">
+            <ValueMapping iterative-binds-to="iRoute" maps-to="pCost(iRoute)"/>
+        </ArrayMapping>
+        <ArrayMapping name="times">
+            <ValueMapping iterative-binds-to="iRoute" maps-to="pTime(iRoute)"/>
+        </ArrayMapping>
+    </ObjectMapping>
+</AimmsJSONMapping>
