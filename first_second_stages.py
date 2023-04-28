@@ -1,4 +1,4 @@
-from gurbi import *
+from gurobi import *
 
 
 def first_stage(S, c_f):
