@@ -21,6 +21,8 @@ def first_stage(S, c_f):
     model.setParam('OutputFlag',0)
     model.optimize()
 
+    return {s:sum(n*x[n,s].X for n in N) for s in S if sum(x[n,s].X for n in N) == 1}
+
 def get_graph(s,K,a,pi,sigma):
 
     Ks = [k for k in K if pi[f"V{k}"]>0]
@@ -31,7 +33,6 @@ def get_graph(s,K,a,pi,sigma):
     rc = {arc:-pi[f"V{arc[1]}"]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else -pi[f"V{arc[1]}"]) for arc in A}
     
     return V,A,rc
-
 
 def vertices_extensions(V,A):
     
@@ -68,7 +69,7 @@ def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
             else:
                 new_labels.append(new_label)
                 label_dominance(new_label,dominated)
-        
+    
     def label_dominance(new_label,dominated):
         for l in range(len(labels)):
             if set(labels[l][0]).issubset(set(new_label[0])):
@@ -105,7 +106,7 @@ def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
 
     return routes
 
-def chorizo_maker_new(S,K,K_s):
+def initial_routes(S,K,K_s):
 
     routes = {0:[]}
     for k in K:
@@ -118,7 +119,7 @@ def chorizo_maker_new(S,K,K_s):
 
     return routes
 
-def master_problem(S,C,y,routes,S_c,C_s,output=0,write=0,integer=0):
+def master_problem(S,C,y,routes,S_c,C_s,output=0,integer=0):
 
     R = {s:range(len(routes[s])) for s in S+[0]}
 
@@ -158,17 +159,9 @@ def master_problem(S,C,y,routes,S_c,C_s,output=0,write=0,integer=0):
 
     return pi_0,infeasible,m.getObjective().getValue(),z
 
-def second_stage_ESPP(S,K,T,y,a,d,r,t):
+def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
-    def feas(v,s):
-        return d[v,s]<=r[v] and a[v,s]+t[v,s]<=T
-    
-    i = 0
-
-    S_k = {k:[s for s in S if feas(k,s)] for k in K}
-    K_s = {s:[k for k in K if feas(k,s)] for s in S}
-    routes = chorizo_maker_new(S,K,K_s)
-
+    routes = initial_routes(S,K,K_s)
     time0 = process_time()
 
     while True:
@@ -191,4 +184,3 @@ def second_stage_ESPP(S,K,T,y,a,d,r,t):
         pi, infeasible, objMP, zz = master_problem(S,K,y,routes,S_k,K_s,output=0,integer=1)
 
     return objMP
-
