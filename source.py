@@ -6,7 +6,10 @@ import pickle
 
 #### parametrers ####
 path = "C:/Users/a.rojasa55/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
-#path = "C:/Users/ari_r/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
+# path = "C:/Users/ari_r/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
+
+path = '/Users/juanbeta/My Drive/Research/MOPTA/MOPTA-23/Data/'
+
 vehicles = pd.read_csv(path+'MOPTA2023_car_locations.csv', sep = ',', header = None)
 
 stations = pd.read_csv(path+"fuel_stations.csv")
