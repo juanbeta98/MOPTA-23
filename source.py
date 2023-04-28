@@ -52,7 +52,7 @@ def first_stage(S, c_f):
     N = range(1,9)
 
     x = dict()
-    x.update({(n,s): model.addVar(vtype=gb.GRB.BINARY, name=f'x_{n}{s}')} for n in N for s in S)
+    x.update({(n,s): model.addVar(vtype=gb.GRB.BINARY, name=f'x_{n}{s}') for n in N for s in S})
 
     model.addConstr(gb.quicksum(x[n,s] for n in N for s in S) == 600)
 
@@ -65,7 +65,7 @@ def first_stage(S, c_f):
     model.setParam('OutputFlag',0)
     model.optimize()
 
-    return {s:sum(n*x[n,s].X for n in N) for s in S if sum(x[n,s].X for n in N) == 1}
+    return {s:sum(n*x[n,s].X for n in N) for s in S if sum(x[n,s].X for n in N) == 1}, model, x
 
 def get_graph(s,K,a,pi,sigma):
 
@@ -204,10 +204,11 @@ def master_problem(S,C,y,routes,S_c,C_s,output=0,integer=0):
     return pi_0,infeasible,m.getObjective().getValue(),z
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
-
+    
     routes = initial_routes(S,K,K_s)
     time0 = process_time()
-
+    i = 0
+    print(f"-----Second Stage iteration {i}")
     while True:
         i += 1
 
