@@ -1,6 +1,7 @@
 import gurobipy as gb
 import networkx as nx
 import numpy as np; import pandas as pd; from time import process_time
+import pickle
 
 
 #### parametrers ####
@@ -24,6 +25,25 @@ stations.rename(columns={"Longitude": 0, "Latitude":1}, inplace=True)
 #### parametrers ####
 
 
+def load_pickle(path, scenario):
+
+    file = open(path + f'/K/K_sc{scenario}', 'rb')
+    K = pickle.load(file)
+    file.close()
+
+    file = open(path + f'/K_s/Ks_sc{scenario}', 'rb')
+    K_s = pickle.load(file)
+    file.close()
+
+    file = open(path + f'/S_k/Sk_sc{scenario}', 'rb')
+    S_k = pickle.load(file)
+    file.close()
+    
+    file = open(path + f'/a t/at_{scenario}', 'rb')
+    a,t = pickle.load(file)
+    file.close()
+
+    return K, K_s, S_k, a, t
 
 
 def first_stage(S, c_f):
