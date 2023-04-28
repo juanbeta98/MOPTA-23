@@ -2,6 +2,30 @@ import gurobipy as gb
 import networkx as nx
 import numpy as np; import pandas as pd; from time import process_time
 
+
+#### parametrers ####
+path = "C:/Users/a.rojasa55/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
+#path = "C:/Users/ari_r/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
+vehicles = pd.read_csv(path+'MOPTA2023_car_locations.csv', sep = ',', header = None)
+
+stations = pd.read_csv(path+"fuel_stations.csv")
+
+northern = (-79.761960, 42.269385)
+southern = (-76.9909,39.7198)
+western = (-80.519400, 40.639400)
+eastern = (-74.689603, 41.363559)
+
+stations_loc = stations[["Longitude","Latitude"]]
+stations_loc["Latitude"] = (stations["Latitude"]-southern[1])*69*165/178
+stations_loc["Longitude"] = (stations["Longitude"]-western[0])*53
+
+stations = stations_loc[(stations_loc["Longitude"] <= 290) & (stations_loc["Latitude"] <= 150)]
+stations.rename(columns={"Longitude": 0, "Latitude":1}, inplace=True)
+#### parametrers ####
+
+
+
+
 def first_stage(S, c_f):
 
     model = gb.Model('first stage')
