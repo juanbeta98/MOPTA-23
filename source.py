@@ -45,7 +45,6 @@ def load_pickle(path, scenario):
 
     return K, K_s, S_k, a, t
 
-
 def first_stage(S, c_f):
 
     model = gb.Model('first stage')
@@ -207,13 +206,16 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
     
     routes = initial_routes(S,K,K_s)
     time0 = process_time()
-    i = 0
+    i = 0; estancado = False; lastObj = 1e6
     print(f"-----Second Stage iteration {i}")
     while True:
         i += 1
 
         pi, infeasible, objMP,zz = master_problem(S,K,y,routes,S_k,K_s,output=0)
-        print(f"Iteration {i}:\n{len(infeasible)} vehicles\tMP obj: {round(objMP,2)}\ttime: {round(process_time()-time0,2)}s")
+        print(f"Iteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(objMP,2)}\ttime: {round(process_time()-time0,2)}s")
+
+        if lastObj - objMP < 1: estancado = True; break
+        else: lastObj = objMP
 
         opt = {}
         for s in S:
@@ -225,7 +227,7 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
         if sum(len(opt[s]) for s in S) == 0: break
     
-    if sum([1 for s in S for k in K_s[s] if zz[k,s]-int(zz[k,s]) > 0]) > 0:
+    if objMP == 0 or not estancado:
         pi, infeasible, objMP, zz = master_problem(S,K,y,routes,S_k,K_s,output=0,integer=1)
 
     return objMP
