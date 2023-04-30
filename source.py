@@ -27,7 +27,6 @@ stations = stations_loc[(stations_loc["Longitude"] <= 290) & (stations_loc["Lati
 stations.rename(columns={"Longitude": 0, "Latitude":1}, inplace=True)
 #### parametrers ####
 
-
 def load_pickle(path, scenario):
 
     file = open(path + f'/K/K_sc{scenario}', 'rb')
@@ -71,12 +70,13 @@ def first_stage(S, c_f):
 
 def get_graph(s,K,a,pi,sigma):
 
-    Ks = [k for k in K if pi[f"V{k}"]>0]
+    dist = {k:a[k,s] for k in K if pi[k]>0}
+    Ks = [k for k in sorted(dist, key=dist.get)]
 
     V = ["s"] + Ks + ["e"]
-    A = [(i,j) for i in V for j in V if i!=j and i!="e" and j!="s" and a[i,s] < a[j,s] and (i,j)!=("s","e")]
+    A = [(i,j) for i in V for j in V if i!=j and i!="e" and j!="s" and a[i,s] <= a[j,s] and (i,j)!=("s","e")]
 
-    rc = {arc:-pi[f"V{arc[1]}"]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else -pi[f"V{arc[1]}"]) for arc in A}
+    rc = {arc:-pi[arc[1]]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else -pi[arc[1]]) for arc in A}
     
     return V,A,rc
 
@@ -90,12 +90,15 @@ def vertices_extensions(V,A):
     
     return outbound_arcs
 
-def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
+def label_algorithm(s,K,K_s,T,r,t,a,ext,mp,lbd,vehic_constr,stat_constr):
 
     def label_extension(l,arc,dominated):
         for m in range(1):
             i = arc[0]; j = arc[1]
             new_label = [[], 0, 0, 0]
+
+            ''' Check cycle feasibility '''
+            if j in l[0]: break
 
             ''' Check waiting line feasibility '''
             if a[j,s] < l[2]: break
@@ -103,8 +106,9 @@ def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
             else: new_label[2] = l[3]
 
             ''' Check time consumption feasibility '''
+            if l[3] > a[j,s] + T: break
             new_label[3] = l[3] + max(0,a[j,s]-l[3]) + t[j,s]
-            if new_label[3] > T: break
+            #if new_label[3] > T: break
             
             ''' Update the resources consumption '''
             new_label[0] += l[0] + [j]
@@ -113,13 +117,13 @@ def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
             if j == "e":
                 done.append(new_label)
             else:
-                new_labels.append(new_label)
-                label_dominance(new_label,dominated)
+                new_labels[j].append(new_label)
+                label_dominance(new_label,j,dominated)
     
-    def label_dominance(new_label,dominated):
-        for l in range(len(labels)):
-            if set(labels[l][0]).issubset(set(new_label[0])):
-                dominated[l] = True
+    def label_dominance(new_label,j,dominated):
+        for l in range(len(labels[j])):
+            if set(labels[j][l][0]).issubset(set(new_label[0])):
+                dominated[j][l] = True
 
     ''' Labels list '''
     # Index: number of label
@@ -127,110 +131,87 @@ def label_algorithm(s,V,K,T,r,t,a,ext,pi,sigma):
     # 1: cumulative reduced cost
     # 2: last moment where there was a vehicle waiting in line to use the charger
     # 3: cumulative time consumption
-    labels = [ [[arc[0], arc[1]], r[arc], a[arc[1],s], a[arc[1],s]+t[arc[1],s]] for arc in ext["s"]]
+    labels = dict()
+    for k in K_s:
+        if ("s",k) in ext["s"]: labels[k] = [ [["s",k], r["s",k], a[k,s], a[k,s]+t[k,s]] ]
+        else: labels[k] = []
     done = []
 
-    while len(labels) > 0:
+    act = 1
+    while act > 0:
         
-        L = range(len(labels))
-        new_labels = []
-        dominated = {l:False for l in L}
-        for l in L:
-            for arc in ext[labels[l][0][-1]]:
-                if not dominated[l]:
-                    label_extension(labels[l], arc, dominated)
+        L = {k:len(labels[k]) for k in K_s}
+        new_labels = {k:[] for k in K_s}
+        dominated = {k:{l:False for l in range(L[k])} for k in K_s}
+        for k in K_s:
+            for l in range(L[k]):
+                if not dominated[k][l]:
+                    for arc in ext[labels[k][l][0][-1]]:
+                        label_extension(labels[k][l], arc, dominated)
 
-        del labels[:len(L)]
         labels = new_labels.copy()
+        act = sum(len(labels[k]) for k in K_s)
     
-    routes = []
+    routes = 0
     for l in range(len(done)):
         # If reduced cost is negative
         if done[l][1] < -0.001:
             col = {k:1 if k in done[l][0] else 0 for k in K}
-            routes.append((col,done[l][1]+sum(pi[f"V{k}"]*col[k] for k in K)+sigma))
+            new_Col = gb.Column(col.values(),vehic_constr.values())
+            lbd.append(mp.addVar(vtype=gb.GRB.CONTINUOUS,obj=0,column=new_Col))
+
+            mp.chgCoeff(stat_constr[s],lbd[-1],1)
+            #mp.update()
+
+            routes += 1
 
     return routes
 
-def initial_routes(S,K,K_s):
-
-    routes = {0:[]}
-    for k in K:
-        routes[0].append(({kk:1 if kk == k else 0 for kk in K},1))
-
-    np.random.seed(0)
-    for s in S:
-        rand = np.random.choice(K_s[s])
-        routes[s] = [({k:1 if k == rand else 0 for k in K_s[s]},0)]
-
-    return routes
-
-def master_problem(S,C,y,routes,S_c,C_s,output=0,integer=0):
-
-    R = {s:range(len(routes[s])) for s in S+[0]}
-
-    f_r = {s:{r:routes[s][r][1] for r in R[s]} for s in S+[0]}
-    z_r = {s:{r:routes[s][r][0] for r in R[s]} for s in S+[0]}
-
-    m = gb.Model("Restricted Master Problem")
-
-    if integer == 1: nat = gb.GRB.BINARY
-    else: nat = gb.GRB.CONTINUOUS
-
-    lbd = {s:{r:m.addVar(name=f"lambda_{s,r}",vtype=nat) for r in R[s]} for s in S+[0]}
-
-    for c in C:
-        m.addConstr(gb.quicksum(z_r[s][r][c]*lbd[s][r] for s in S_c[c]+[0] for r in R[s]) >= 1, f"V{c}_assignment")
-
-    for s in S:
-        m.addConstr(gb.quicksum(lbd[s][r] for r in R[s]) <= y[s], f"S{s}_convexity")
-    
-    m.setObjective(gb.quicksum(f_r[s][r]*lbd[s][r] for s in S+[0] for r in R[s]))
-
-    m.update()
-    m.setParam("OutputFlag",output)
-    m.optimize()
-
-    z = {(c,s):sum(z_r[s][r][c]*lbd[s][r].X for r in R[s]) for s in S for c in C_s[s]}
-    infeasible = [c for c in C if sum(z_r[0][r][c]*lbd[0][r].X for r in R[0]) > 0]
-
-    pi_0 = {}
-    if integer == 0:
-        for c in C:
-            cons = m.getConstrByName(f"V{c}_assignment")
-            pi_0[f"V{c}"] = cons.getAttr("Pi")
-        for s in S:
-            cons = m.getConstrByName(f"S{s}_convexity")
-            pi_0[f"S{s}"] = cons.getAttr("Pi")
-
-    return pi_0,infeasible,m.getObjective().getValue(),z
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
-    
-    routes = initial_routes(S,K,K_s)
-    time0 = process_time()
-    i = 0; estancado = False; lastObj = 1e6
-    print(f"-----Second Stage iteration {i}")
+
+    mp = gb.Model("Restricted Master Problem")
+
+    dummy_0 = {k:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=1, name=f"st0_{k}") for k in K}
+    aux = {s:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=2, name=f"aux_{s}") for s in S}
+
+    vehic_assign = {}
+    for k in K:
+        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
+
+    st_conv = {}
+    for s in S:
+        st_conv[s] = mp.addConstr(aux[s] <= y[s], f"S{s}_convexity")
+
+    mp.setParam("OutputFlag",0)
+
+    time0 = process_time(); i = 0
+    lbd = []
+
     while True:
+        
+        mp.update()
+        mp.optimize()
+
+        pi = {k:vehic_assign[k].getAttr("Pi") for k in K}
+        sigmas = {s:st_conv[s].getAttr("Pi") for s in S}
+
+        infeasible = [k for k in K if dummy_0[k].X > 0]
+
+        print(f"Iteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
         i += 1
-
-        pi, infeasible, objMP,zz = master_problem(S,K,y,routes,S_k,K_s,output=0)
-        print(f"Iteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(objMP,2)}\ttime: {round(process_time()-time0,2)}s")
-
-        if lastObj - objMP < 1: estancado = True; break
-        else: lastObj = objMP
 
         opt = {}
         for s in S:
-            V,A,rc = get_graph(s,K_s[s],a,pi,pi[f"S{s}"])
+            V,A,rc = get_graph(s,K_s[s],a,pi,sigmas[s])
             ext = vertices_extensions(V,A)
-            opt[s] = label_algorithm(s,V,K,T,rc,t,a,ext,pi,pi[f"S{s}"])
-            #print(f"Station {s}: {len(opt[s])} new columns")
-            routes[s] += opt[s]
+            opt[s] = label_algorithm(s,K,K_s[s],T,rc,t,a,ext,mp,lbd,vehic_assign,st_conv)
 
-        if sum(len(opt[s]) for s in S) == 0: break
+        if sum(opt[s] for s in S) == 0: break
     
-    if objMP == 0 or not estancado:
-        pi, infeasible, objMP, zz = master_problem(S,K,y,routes,S_k,K_s,output=0,integer=1)
+    if mp.getObjective().getValue() == 0:
+        for v in mp.getVars():
+            v.vtype = gb.GRB.BINARY
+        mp.update(); mp.optimize()
 
-    return objMP
+    return mp.getObjective().getValue(), infeasible
