@@ -6,9 +6,6 @@ import pickle
 
 #### parametrers ####
 path = "C:/Users/a.rojasa55/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
-# path = "C:/Users/ari_r/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
-
-#path = '/Users/juanbeta/My Drive/Research/MOPTA/MOPTA-23/Data/'
 
 vehicles = pd.read_csv(path+'MOPTA2023_car_locations.csv', sep = ',', header = None)
 
@@ -33,11 +30,11 @@ def load_pickle(path, scenario):
     K = pickle.load(file)
     file.close()
 
-    file = open(path + f'/K_s/Ks_sc{scenario}', 'rb')
+    file = open(path + f'/K_s10/Ks_sc{scenario}', 'rb')
     K_s = pickle.load(file)
     file.close()
 
-    file = open(path + f'/S_k/Sk_sc{scenario}', 'rb')
+    file = open(path + f'/S_k10/Sk_sc{scenario}', 'rb')
     S_k = pickle.load(file)
     file.close()
     
@@ -106,9 +103,8 @@ def label_algorithm(s,K,K_s,T,r,t,a,ext,mp,lbd,vehic_constr,stat_constr):
             else: new_label[2] = l[3]
 
             ''' Check time consumption feasibility '''
-            if l[3] > a[j,s] + T: break
+            #if l[3] > a[j,s] + T: break
             new_label[3] = l[3] + max(0,a[j,s]-l[3]) + t[j,s]
-            #if new_label[3] > T: break
             
             ''' Update the resources consumption '''
             new_label[0] += l[0] + [j]
@@ -161,11 +157,35 @@ def label_algorithm(s,K,K_s,T,r,t,a,ext,mp,lbd,vehic_constr,stat_constr):
             lbd.append(mp.addVar(vtype=gb.GRB.CONTINUOUS,obj=0,column=new_Col))
 
             mp.chgCoeff(stat_constr[s],lbd[-1],1)
-            #mp.update()
 
             routes += 1
 
     return routes
+
+
+def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,T,ext):
+    for m in range(1):
+        
+        if len(cK) > 0 and (P[-1] in cK or (P[-1]=="s" and v in cK)): break
+        
+        if v in P: break
+        if a[v,s] < qP: break
+        if tP - t[v,s] > a[v,s] + T: break
+
+        nP = P + [v]
+        if v == "e":
+            cK.update(nP[1:-1])
+            if rP < -0.001:
+                L.append(P[1:])
+
+        if a[v,s] == tP - t[v,s]: nqP = qP
+        else: nqP = tP - t[v,s]
+
+        for arc in ext[v]:
+            vv = arc[1]
+            ntP = max(tP,a[vv,s]) + t[vv,s]
+            nrP = rP + r[v,vv]
+            label_DFS(vv,nrP,ntP,nqP,nP,cK,L,s,r,t,a,T,ext)
 
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
@@ -177,7 +197,7 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
     vehic_assign = {}
     for k in K:
-        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
+        vehic_assign[k] = mp.addConstr(dummy_0[k] >= 1, f"V{k}_assignment")
 
     st_conv = {}
     for s in S:
@@ -198,16 +218,29 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
         infeasible = [k for k in K if dummy_0[k].X > 0]
 
-        print(f"Iteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
+        print(f"\t\tIteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
         i += 1
 
-        opt = {}
+        opt = 0
         for s in S:
+            
             V,A,rc = get_graph(s,K_s[s],a,pi,sigmas[s])
             ext = vertices_extensions(V,A)
-            opt[s] = label_algorithm(s,K,K_s[s],T,rc,t,a,ext,mp,lbd,vehic_assign,st_conv)
 
-        if sum(opt[s] for s in S) == 0: break
+            #opt[s] = label_algorithm(s,K,K_s[s],T,rc,t,a,ext,mp,lbd,vehic_assign,st_conv)
+
+            routes_DFS = []; covered_nodes = set()
+            label_DFS(v="s",rP=0,tP=0,qP=0,P=[],cK=covered_nodes,L=routes_DFS,s=s,r=rc,t=t,a=a,T=T,ext=ext)
+            opt += len(routes_DFS)
+
+            for l in routes_DFS:
+                col = {k:1 if k in l else 0 for k in K}
+                new_Col = gb.Column(col.values(),vehic_assign.values())
+                lbd.append(mp.addVar(vtype=gb.GRB.CONTINUOUS,obj=0,ub=1,column=new_Col))
+
+                mp.chgCoeff(st_conv[s],lbd[-1],1)
+
+        if opt == 0: break
     
     if mp.getObjective().getValue() == 0:
         for v in mp.getVars():
