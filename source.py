@@ -242,9 +242,8 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
         if opt == 0: break
     
-    if mp.getObjective().getValue() == 0:
-        for v in mp.getVars():
-            v.vtype = gb.GRB.BINARY
-        mp.update(); mp.optimize()
+    for v in mp.getVars():
+        v.vtype = gb.GRB.BINARY
+    mp.update(); mp.optimize()
 
     return mp.getObjective().getValue(), infeasible
