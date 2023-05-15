@@ -81,111 +81,39 @@ def vertices_extensions(V,A):
     
     G = nx.DiGraph()
     G.add_nodes_from(V); G.add_edges_from(A)
-    outbound_arcs = {}
+    successors = {}
     for v in V:
-        outbound_arcs[v] = list(G.out_edges(v))
-    
-    return outbound_arcs
+        successors[v] = list(G.successors(v))
 
-def label_algorithm(s,K,K_s,T,r,t,a,ext,mp,lbd,vehic_constr,stat_constr):
+    return successors
 
-    def label_extension(l,arc,dominated):
-        for m in range(1):
-            i = arc[0]; j = arc[1]
-            new_label = [[], 0, 0, 0]
-
-            ''' Check cycle feasibility '''
-            if j in l[0]: break
-
-            ''' Check waiting line feasibility '''
-            if a[j,s] < l[2]: break
-            if a[j,s] > l[3]: new_label[2] = l[2]
-            else: new_label[2] = l[3]
-
-            ''' Check time consumption feasibility '''
-            #if l[3] > a[j,s] + T: break
-            new_label[3] = l[3] + max(0,a[j,s]-l[3]) + t[j,s]
-            
-            ''' Update the resources consumption '''
-            new_label[0] += l[0] + [j]
-            new_label[1] = l[1] + r[(i,j)]
-            
-            if j == "e":
-                done.append(new_label)
-            else:
-                new_labels[j].append(new_label)
-                label_dominance(new_label,j,dominated)
-    
-    def label_dominance(new_label,j,dominated):
-        for l in range(len(labels[j])):
-            if set(labels[j][l][0]).issubset(set(new_label[0])):
-                dominated[j][l] = True
-
-    ''' Labels list '''
-    # Index: number of label
-    # 0: route
-    # 1: cumulative reduced cost
-    # 2: last moment where there was a vehicle waiting in line to use the charger
-    # 3: cumulative time consumption
-    labels = dict()
-    for k in K_s:
-        if ("s",k) in ext["s"]: labels[k] = [ [["s",k], r["s",k], a[k,s], a[k,s]+t[k,s]] ]
-        else: labels[k] = []
-    done = []
-
-    act = 1
-    while act > 0:
-        
-        L = {k:len(labels[k]) for k in K_s}
-        new_labels = {k:[] for k in K_s}
-        dominated = {k:{l:False for l in range(L[k])} for k in K_s}
-        for k in K_s:
-            for l in range(L[k]):
-                if not dominated[k][l]:
-                    for arc in ext[labels[k][l][0][-1]]:
-                        label_extension(labels[k][l], arc, dominated)
-
-        labels = new_labels.copy()
-        act = sum(len(labels[k]) for k in K_s)
-    
-    routes = 0
-    for l in range(len(done)):
-        # If reduced cost is negative
-        if done[l][1] < -0.001:
-            col = {k:1 if k in done[l][0] else 0 for k in K}
-            new_Col = gb.Column(col.values(),vehic_constr.values())
-            lbd.append(mp.addVar(vtype=gb.GRB.CONTINUOUS,obj=0,column=new_Col))
-
-            mp.chgCoeff(stat_constr[s],lbd[-1],1)
-
-            routes += 1
-
-    return routes
-
-
-def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,T,ext):
+def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
     for m in range(1):
         
         if len(cK) > 0 and (P[-1] in cK or (P[-1]=="s" and v in cK)): break
         
         if v in P: break
         if a[v,s] < qP: break
-        if tP - t[v,s] > a[v,s] + T: break
 
-        nP = P + [v]
         if v == "e":
-            cK.update(nP[1:-1])
+            cK.update(P[1:])
             if rP < -0.001:
                 L.append(P[1:])
+            break
+        nP = P + [v]
 
         if a[v,s] == tP - t[v,s]: nqP = qP
         else: nqP = tP - t[v,s]
 
-        for arc in ext[v]:
-            vv = arc[1]
-            ntP = max(tP,a[vv,s]) + t[vv,s]
-            nrP = rP + r[v,vv]
-            label_DFS(vv,nrP,ntP,nqP,nP,cK,L,s,r,t,a,T,ext)
+        nodes = ext[v][:-1]
+        fin_times = np.array([np.max((tP,a[i,s]))+t[i,s] for i in nodes])
+        sorted_indices = np.argsort(fin_times)
+        sort_array = np.array(nodes)[sorted_indices].tolist()
+        for v1 in sort_array:
+            ntP = np.max((tP,a[v1,s])) + t[v1,s]
+            nrP = rP + r[v,v1]
+            label_DFS(v1,nrP,ntP,nqP,nP,cK,L,s,r,t,a,ext)
+        label_DFS("e",rP,tP,nqP,nP,cK,L,s,r,t,a,ext)
 
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
@@ -230,7 +158,7 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
             #opt[s] = label_algorithm(s,K,K_s[s],T,rc,t,a,ext,mp,lbd,vehic_assign,st_conv)
 
             routes_DFS = []; covered_nodes = set()
-            label_DFS(v="s",rP=0,tP=0,qP=0,P=[],cK=covered_nodes,L=routes_DFS,s=s,r=rc,t=t,a=a,T=T,ext=ext)
+            label_DFS(v="s",rP=0,tP=0,qP=0,P=[],cK=covered_nodes,L=routes_DFS,s=s,r=rc,t=t,a=a,ext=ext)
             opt += len(routes_DFS)
 
             for l in routes_DFS:
@@ -240,10 +168,12 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
                 mp.chgCoeff(st_conv[s],lbd[-1],1)
 
-        if opt == 0: break
+        if opt == 0: mpsol = mp.getObjective().getValue(); break
     
     for v in mp.getVars():
         v.vtype = gb.GRB.BINARY
+    if mpsol > 0: mp.setParam("MIPGap",0.01)
+    mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
 
-    return mp.getObjective().getValue(), infeasible
+    return mpsol, mp.getObjective().getValue()
