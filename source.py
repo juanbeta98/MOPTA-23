@@ -61,7 +61,8 @@ def check_dominance(path,routes):
 def label_DFS_exhaustive(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
     for m in range(1):
         
-        if P[-1]=="s" and v in cK: break
+        if v!= "s":
+            if P[-1]=="s" and v in cK: break
 
         if v in P: break
         if a[v,s] < qP: break
@@ -76,7 +77,7 @@ def label_DFS_exhaustive(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
         for v1 in ext[v]:
             ntP = np.max((tP,a[v1,s])) + t[v1,s]
             nrP = rP + r[v,v1]
-            label_DFS_exhaustive(v1,nrP,ntP,nqP,nP,L,s,r,t,a,ext)
+            label_DFS_exhaustive(v1,nrP,ntP,nqP,nP,cK,L,s,r,t,a,ext)
 
 
 def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
