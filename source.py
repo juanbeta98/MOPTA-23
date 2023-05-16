@@ -51,6 +51,34 @@ def vertices_extensions(V,A):
 
     return successors
 
+def check_dominance(path,routes):
+        dom = False
+        for i in range(len(routes)-1,-1,-1):
+            if set(path).issubset(routes[i]):
+                dom = True; break
+        if not dom: routes.append(path)
+
+def label_DFS_exhaustive(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
+    for m in range(1):
+        
+        if P[-1]=="s" and v in cK: break
+
+        if v in P: break
+        if a[v,s] < qP: break
+
+        nP = P + [v]
+        if v == "e" and rP<-0.001:
+            check_dominance(P[1:],L)
+
+        if a[v,s] == tP - t[v,s]: nqP = qP; cK.add(v)
+        else: nqP = tP - t[v,s]
+
+        for v1 in ext[v]:
+            ntP = np.max((tP,a[v1,s])) + t[v1,s]
+            nrP = rP + r[v,v1]
+            label_DFS_exhaustive(v1,nrP,ntP,nqP,nP,L,s,r,t,a,ext)
+
+
 def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
     for m in range(1):
         
