@@ -2,27 +2,11 @@ import gurobipy as gb
 import networkx as nx
 import numpy as np; import pandas as pd; from time import process_time
 import pickle
-
+import os
 
 #### parametrers ####
-path = "C:/Users/a.rojasa55/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
-
-vehicles = pd.read_csv(path+'MOPTA2023_car_locations.csv', sep = ',', header = None)
-
-stations = pd.read_csv(path+"fuel_stations.csv")
-
-northern = (-79.761960, 42.269385)
-southern = (-76.9909,39.7198)
-western = (-80.519400, 40.639400)
-eastern = (-74.689603, 41.363559)
-
-stations_loc = stations[["Longitude","Latitude"]]
-stations_loc["Latitude"] = (stations["Latitude"]-southern[1])*69*165/178
-stations_loc["Longitude"] = (stations["Longitude"]-western[0])*53
-
-stations = stations_loc[(stations_loc["Longitude"] <= 290) & (stations_loc["Latitude"] <= 150)]
-stations.rename(columns={"Longitude": 0, "Latitude":1}, inplace=True)
-#### parametrers ####
+path = os.getcwd()+"/Data/"
+#path = "C:/Users/ari_r/OneDrive - Universidad de los Andes/Documentos/MOPTA-23/Data/"
 
 def load_pickle(path, scenario):
 
@@ -44,26 +28,6 @@ def load_pickle(path, scenario):
 
     return K, K_s, S_k, a, t
 
-def first_stage(S, c_f):
-
-    model = gb.Model('first stage')
-    N = range(1,9)
-
-    x = dict()
-    x.update({(n,s): model.addVar(vtype=gb.GRB.BINARY, name=f'x_{n}{s}') for n in N for s in S})
-
-    model.addConstr(gb.quicksum(x[n,s] for n in N for s in S) == 600)
-
-    for s in S:
-        model.addConstr(gb.quicksum(x[n,s] for n in N) <= 1)
-    
-    model.setObjective(gb.quicksum(c_f*n*x[n,s] for n in N for s in S))
-
-    model.update()
-    model.setParam('OutputFlag',0)
-    model.optimize()
-
-    return {s:sum(n*x[n,s].X for n in N) for s in S if sum(x[n,s].X for n in N) == 1}, model, x
 
 def get_graph(s,K,a,pi,sigma):
 
