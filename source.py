@@ -41,6 +41,18 @@ def get_graph(s,K,a,pi,sigma):
     
     return V,A,rc
 
+def get_graph_chargers(s,K,a,pi,sigma):
+
+    dist = {k:a[k,s] for k in K if pi[k]<1}
+    Ks = [k for k in sorted(dist, key=dist.get)]
+
+    V = ["s"] + Ks + ["e"]
+    A = [(i,j) for i in V for j in V if i!=j and i!="e" and j!="s" and a[i,s] <= a[j,s] and (i,j)!=("s","e")]
+
+    rc = {arc:1-pi[arc[1]]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else 1-pi[arc[1]]) for arc in A}
+    
+    return V,A,rc
+
 def vertices_extensions(V,A):
     
     G = nx.DiGraph()
@@ -108,6 +120,33 @@ def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
             label_DFS(v1,nrP,ntP,nqP,nP,cK,L,s,r,t,a,ext)
         label_DFS("e",rP,tP,nqP,nP,cK,L,s,r,t,a,ext)
 
+def label_DFS_chargers(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
+    for m in range(1):
+        
+        if len(cK) > 0 and (P[-1] in cK or (P[-1]=="s" and v in cK)): break
+        
+        if v in P: break
+        if a[v,s] < qP: break
+
+        if v == "e":
+            cK.update(P[1:])
+            if rP > 0.001:
+                L.append(P[1:])
+            break
+        nP = P + [v]
+
+        if a[v,s] == tP - t[v,s]: nqP = qP
+        else: nqP = tP - t[v,s]
+
+        nodes = ext[v][:-1]
+        fin_times = np.array([np.max((tP,a[i,s]))+t[i,s] for i in nodes])
+        sorted_indices = np.argsort(fin_times)
+        sort_array = np.array(nodes)[sorted_indices].tolist()
+        for v1 in sort_array:
+            ntP = np.max((tP,a[v1,s])) + t[v1,s]
+            nrP = rP + r[v,v1]
+            label_DFS_chargers(v1,nrP,ntP,nqP,nP,cK,L,s,r,t,a,ext)
+        label_DFS_chargers("e",rP,tP,nqP,nP,cK,L,s,r,t,a,ext)
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
