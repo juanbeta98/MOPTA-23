@@ -146,7 +146,7 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
         infeasible = [k for k in K if dummy_0[k].X > 0]
 
-        print(f"\t\tIteration {i}:\t{len(infeasible)} infeasible vehicles\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
+        print(f"\t\tIteration {i}:\t\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
         i += 1
 
         opt = 0
