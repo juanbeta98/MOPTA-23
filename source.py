@@ -114,7 +114,6 @@ def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
         fin_times = np.array([np.max((tP,a[i,s]))+t[i,s] for i in nodes])
         sorted_indices = np.argsort(fin_times)
         sort_array = np.array(nodes)[sorted_indices].tolist()
-        if v == 10655: print(f"Successors of 10655: {sort_array}")
         for v1 in sort_array:
             ntP = np.max((tP,a[v1,s])) + t[v1,s]
             nrP = rP + r[v,v1]
