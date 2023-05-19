@@ -43,13 +43,13 @@ def get_graph(s,K,a,pi,sigma):
 
 def get_graph_chargers(s,K,a,pi,sigma):
 
-    dist = {k:a[k,s] for k in K if pi[k]<1}
+    dist = {k:a[k,s] for k in K if pi[k]>0}
     Ks = [k for k in sorted(dist, key=dist.get)]
 
     V = ["s"] + Ks + ["e"]
-    A = [(i,j) for i in V for j in V if i!=j and i!="e" and j!="s" and a[i,s] <= a[j,s] and (i,j)!=("s","e")]
+    A = [(i,j) for i in V for j in V if i!=j and i!="e" and j!="s" and a[i,s] <= a[j,s] and (i,j) != ("s","e")]
 
-    rc = {arc:1-pi[arc[1]]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else 1-pi[arc[1]]) for arc in A}
+    rc = {arc:-pi[arc[1]]-sigma if arc[0]=="s" else (0 if arc[1]=="e" else -pi[arc[1]]) for arc in A}
     
     return V,A,rc
 
@@ -114,6 +114,7 @@ def label_DFS(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
         fin_times = np.array([np.max((tP,a[i,s]))+t[i,s] for i in nodes])
         sorted_indices = np.argsort(fin_times)
         sort_array = np.array(nodes)[sorted_indices].tolist()
+        if v == 10655: print(f"Successors of 10655: {sort_array}")
         for v1 in sort_array:
             ntP = np.max((tP,a[v1,s])) + t[v1,s]
             nrP = rP + r[v,v1]
@@ -130,7 +131,7 @@ def label_DFS_chargers(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
 
         if v == "e":
             cK.update(P[1:])
-            if rP > 0.001:
+            if rP < -1:
                 L.append(P[1:])
             break
         nP = P + [v]
@@ -147,6 +148,96 @@ def label_DFS_chargers(v,rP,tP,qP,P,cK,L,s,r,t,a,ext):
             nrP = rP + r[v,v1]
             label_DFS_chargers(v1,nrP,ntP,nqP,nP,cK,L,s,r,t,a,ext)
         label_DFS_chargers("e",rP,tP,nqP,nP,cK,L,s,r,t,a,ext)
+
+def update_best_routes(L,P,rP,tP,hP,best_len,best_t,best_h,num_improv):
+    L[P[0]] = (P,rP)
+    best_len[P[0]] = len(P)
+    best_t[P[0]] = tP
+    best_h[P[0]] = hP
+    num_improv[P[0]] += 1
+    #print(f"\tImprov {P[0]}: {num_improv[P[0]]}, best_len = {best_len[P[0]]}")
+
+def check_end_dominance(L,P,rP,tP,hP,best_len,best_t,best_h,num_improv,tried):
+    for m in range(1):
+        #print(P)
+        if len(P) < best_len[P[0]]:
+            tried[P[0]] += 1
+            break
+        elif len(P) > best_len[P[0]]:
+            update_best_routes(L,P,rP,tP,hP,best_len,best_t,best_h,num_improv)
+            break
+        else:
+            if tP < best_t[P[0]]:
+                tried[P[0]] += 1
+                break
+            elif tP > best_t[P[0]]:
+                update_best_routes(L,P,rP,tP,hP,best_len,best_t,best_h,num_improv)
+                break
+            else:
+                if hP > best_h[P[0]]:
+                    tried[P[0]] += 1
+                    break
+                else:
+                    update_best_routes(L,P,rP,tP,hP,best_len,best_t,best_h,num_improv)
+                    break
+
+def update_max_succesors(P, marked, max_successors):
+    for k in marked:
+                if marked[k]:
+                    ix = P.index(k)
+                    if max_successors[k] == 100: max_successors[k] = len(P[ix:])
+                    else:
+                        max_successors[k] = np.max(( max_successors[k], len(P[ix:]) ))
+
+def sort_extensions(v,s,tP,ext,a,t):
+
+    if v == "s": nodes = ext
+    else: nodes = ext[:-1]
+    fin_times = np.array([np.max((tP,a[i,s]))+t[i,s] for i in nodes])
+    sorted_indices = np.argsort(fin_times)
+    sort_array = np.array(nodes)[sorted_indices].tolist()
+    if v != "s": sort_array.append("e")
+
+    return sort_array
+
+def mod_label_DFS(v,rP,tP,qP,hP,P,cK,L,s,r,t,a,ext,best_len,best_t,best_h,num_improv,tried,marked,max_successors):
+    for m in range(1):
+        
+        if len(P) > 1 and v!="e":
+            if len(P[1:]) + max_successors[v] < best_len[P[1]]: break
+            if num_improv[P[1]] > 3 or tried[P[1]] > 1000: break
+        
+        if cK[v]: break
+        if len(P) == 1:
+            li = np.concatenate([L[kk][0] for kk in L])
+            cK.update({k:1 if k in li else 0 for k in cK})
+            for k in cK:
+                if cK[k] == 0: max_successors[k] = 100
+            if cK[v]: break
+
+        if v in P: break
+        if a[v,s] < qP: break
+
+        if v == "e":
+            update_max_succesors(P, marked, max_successors)
+            check_end_dominance(L,P[1:],rP,tP,hP,best_len,best_t,best_h,num_improv,tried)
+            break
+        nP = P + [v]
+
+        if a[v,s] == tP - t[v,s]:
+            nqP = qP
+            if v != "s": marked[v] = 1
+        else: nqP = tP - t[v,s]
+
+        sort_ext = sort_extensions(v,s,tP,ext[v],a,t)
+        for v1 in sort_ext:
+            start_v1 = np.max((tP,a[v1,s]))
+            nhP = hP + start_v1 - tP
+            ntP = start_v1 + t[v1,s]
+            nrP = rP + r[v,v1]
+            mod_label_DFS(v1,nrP,ntP,nqP,nhP,nP,cK,L,s,r,t,a,ext,best_len,best_t,best_h,num_improv,tried,marked,max_successors)
+        marked[v] = 0
+
 
 def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
