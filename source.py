@@ -295,6 +295,7 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
     for v in mp.getVars():
         v.vtype = gb.GRB.BINARY
     if mpsol > 0: mp.setParam("MIPGap",0.01)
+    mp.setParam("TimeLimit",10*60)
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
 
