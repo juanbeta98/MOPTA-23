@@ -362,4 +362,6 @@ def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
 
-    return mpsol, mp.getObjective().getValue()
+    assigned_k = []
+
+    return assigned_k
