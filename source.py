@@ -301,7 +301,8 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
     return mpsol, mp.getObjective().getValue()
 
-def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
+
+def second_stage_chargers(S,K,K_s,y,a,t):
 
     mp = gb.Model("Restricted Master Problem")
 
@@ -331,7 +332,7 @@ def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
 
         infeasible = [k for k in K if dummy_0[k].X > 0]
 
-        print(f"\t\tIteration {i}:\t\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
+        #print(f"\t\tIteration {i}:\t\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
         i += 1
 
         opt = 0
@@ -361,7 +362,16 @@ def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
     mp.setParam("TimeLimit",10*60)
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
+    # print(f"ttSolved IMP scenario {sc}, with {mp.getObjective().getValue()} unnasigned vehicles")
 
-    assigned_k = []
+    routes = {s:list() for s in S}
+    
+    for l in lbd:
+        if l.X > 0.5:
+            for s in S:
+                if mp.getCoeff(st_conv[s],l) == 1:
+                    station_route = s; break
+            col = [k for k in K_s[s] if mp.getCoeff(vehic_assign[k],l) == 1]
+            routes[station_route].append(col)
 
-    return assigned_k
+    return routes, sigmas
