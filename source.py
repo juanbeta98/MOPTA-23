@@ -302,20 +302,20 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
     return mpsol, mp.getObjective().getValue()
 
 
-def second_stage_chargers(S,K,K_s,y,a,t):
+def second_stage_chargers(S,K,K_s,y,a,t,sc):
 
-    mp = gb.Model("Restricted Master Problem")
+    mp = gb.Model(f"Restricted Master Problem_{sc}")
 
-    dummy_0 = {k:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=1, name=f"st0_{k}") for k in K}
-    aux = {s:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=2, name=f"aux_{s}") for s in S}
+    dummy_0 = {k:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=1, name=f"st0_{k}_{sc}") for k in K}
+    aux = {s:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=2, name=f"aux_{s}_{sc}") for s in S}
 
     vehic_assign = {}
     for k in K:
-        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
+        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment_{sc}")
 
     st_conv = {}
     for s in S:
-        st_conv[s] = mp.addConstr(aux[s] <= y[s], f"S{s}_convexity")
+        st_conv[s] = mp.addConstr(aux[s] <= y[s], f"S{s}_convexity_{sc}")
 
     mp.setParam("OutputFlag",0)
 
