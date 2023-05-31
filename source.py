@@ -301,20 +301,21 @@ def second_stage_ESPP(S,K,K_s,S_k,T,y,a,t):
 
     return mpsol, mp.getObjective().getValue()
 
-def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
 
-    mp = gb.Model("Restricted Master Problem")
+def second_stage_chargers(S,K,K_s,y,a,t,sc):
 
-    dummy_0 = {k:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=1, name=f"st0_{k}") for k in K}
-    aux = {s:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=2, name=f"aux_{s}") for s in S}
+    mp = gb.Model(f"Restricted Master Problem_{sc}")
+
+    dummy_0 = {k:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=1, name=f"st0_{k}_{sc}") for k in K}
+    aux = {s:mp.addVar(vtype=gb.GRB.CONTINUOUS, obj=2, name=f"aux_{s}_{sc}") for s in S}
 
     vehic_assign = {}
     for k in K:
-        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
+        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment_{sc}")
 
     st_conv = {}
     for s in S:
-        st_conv[s] = mp.addConstr(aux[s] <= y[s], f"S{s}_convexity")
+        st_conv[s] = mp.addConstr(aux[s] <= y[s], f"S{s}_convexity_{sc}")
 
     mp.setParam("OutputFlag",0)
 
@@ -331,7 +332,7 @@ def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
 
         infeasible = [k for k in K if dummy_0[k].X > 0]
 
-        print(f"\t\tIteration {i}:\t\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
+        #print(f"\t\tIteration {i}:\t\tMP obj: {round(mp.getObjective().getValue(),2)}\ttime: {round(process_time()-time0,2)}s")
         i += 1
 
         opt = 0
@@ -361,7 +362,16 @@ def second_stage_chargers(S,K,K_s,S_k,T,y,a,t):
     mp.setParam("TimeLimit",10*60)
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
+    # print(f"ttSolved IMP scenario {sc}, with {mp.getObjective().getValue()} unnasigned vehicles")
 
-    assigned_k = []
+    routes = {s:list() for s in S}
+    
+    for l in lbd:
+        if l.X > 0.5:
+            for s in S:
+                if mp.getCoeff(st_conv[s],l) == 1:
+                    station_route = s; break
+            col = [k for k in K_s[s] if mp.getCoeff(vehic_assign[k],l) == 1]
+            routes[station_route].append(col)
 
-    return assigned_k
+    return routes, sigmas
