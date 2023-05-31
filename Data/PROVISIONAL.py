@@ -17,6 +17,7 @@ eastern = (-74.689603, 41.363559)
 latitudes = list()
 longitudes = list()
 profiles = list()
+cont = 0
 
 for i in stations.index:
     long = (stations["Longitude"][i]-western[0])*52-1
@@ -25,8 +26,14 @@ for i in stations.index:
     if (long <= 290) & (lat <= 150) & (lat >= 0) & (long >= 0) and i+1:
         latitudes.append(stations['Latitude'][i])
         longitudes.append(stations['Longitude'][i])
-        print(i)
-        profiles.append(profile["Type"][stations["ZIP"][i]])
+        try:
+            profiles.append(profile["Type"][stations["ZIP"][i]])
+        except:
+            print(i)
+            profiles.append('Urban')
+            cont += 1
+
+print(f'{cont} unassigned stations')
 
 file = open('../Results/Configurations/Open Stations/open_stations_18', 'rb')
 open_stations = pickle.load(file)
