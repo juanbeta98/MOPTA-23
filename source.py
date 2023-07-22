@@ -310,7 +310,7 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
 
     vehic_assign = {}
     for k in K:
-        vehic_assign[k] = mp.addConstr(dummy_0[k] >= 1, f"V{k}_assignment")
+        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
 
     st_conv = {}
     for s in S:
@@ -340,7 +340,9 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
             ext = vertices_extensions(V,A)
 
             routes_DFS = []; covered_nodes = set()
+            #print(f"\t\t\tStation {s}, {len(K_s[s])} vehicles")
             label_DFS(v="s",rP=0,tP=0,qP=0,P=[],cK=covered_nodes,L=routes_DFS,s=s,r=rc,t=t,a=a,ext=ext)
+            #print(f"\t\t\tFinished {s}")
             opt += len(routes_DFS)
 
             for l in routes_DFS:
@@ -356,8 +358,11 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
     for v in mp.getVars():
         v.vtype = gb.GRB.BINARY
     if mpsol > 0: mp.setParam("MIPGap",0.01)
+    mp.setParam("TimeLimit",10*60)
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
+
+    print(f"\tIMP obj: {mp.getObjective().getValue()}\tOptimality gap: {mp.MIPGAP}")
 
     results = {"routes":{s:[] for s in S}, "total_serviced_customers":{s:[] for s in S}, "total_total":list(), "infeasible":list()}
     for s in S:
@@ -433,7 +438,8 @@ def second_stage_chargers(S,K,K_s,y,a,t,sc):
     mp.setParam("TimeLimit",10*60)
     mp.setParam("MIPFocus",2)
     mp.update(); mp.optimize()
-    # print(f"ttSolved IMP scenario {sc}, with {mp.getObjective().getValue()} unnasigned vehicles")
+
+    
 
     routes = {s:list() for s in S}
     
