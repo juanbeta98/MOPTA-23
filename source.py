@@ -310,7 +310,7 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
 
     vehic_assign = {}
     for k in K:
-        vehic_assign[k] = mp.addConstr(dummy_0[k] == 1, f"V{k}_assignment")
+        vehic_assign[k] = mp.addConstr(dummy_0[k] >= 1, f"V{k}_assignment")
 
     st_conv = {}
     for s in S:
@@ -364,13 +364,13 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
 
     print(f"\tIMP obj: {mp.getObjective().getValue()}\tOptimality gap: {mp.MIPGAP}")
 
-    results = {"routes":{s:[] for s in S}, "total_serviced_customers":{s:[] for s in S}, "total_total":list(), "infeasible":list()}
+    results = {"routes":{s:[] for s in S}, "total_serviced_customers":{s:[] for s in S}, "total_total":set(), "infeasible":list()}
     for s in S:
         for l in range(len(lbd[s])):
             if lbd[s][l].X > 0.5:
                 results["routes"][s] += [columns[s][l]]
                 results["total_serviced_customers"][s] += columns[s][l]
-                results["total_total"] += columns[s][l]
+                results["total_total"].update(columns[s][l])
     for k in K:
         if dummy_0[k].X > 0.5:
             results["infeasible"].append(k)
