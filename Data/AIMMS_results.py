@@ -1,10 +1,12 @@
 #%%
+# Modules
 import pandas as pd
 import os 
 import pickle
-
 path = os.getcwd()
 
+#%%
+# Read main data
 stations = pd.read_csv(path+"/fuel_stations.csv")
 profile = pd.read_excel(path+"/CountyProfile.xlsx", index_col=0)
 
@@ -29,33 +31,36 @@ for i in stations.index:
         try:
             profiles.append(profile["Type"][stations["ZIP"][i]])
         except:
-            print(i)
             profiles.append('Urban')
             cont += 1
-
-print(f'{cont} unassigned stations')
-
-file = open('../Results/Configurations/Open Stations/open_stations_18', 'rb')
-open_stations = pickle.load(file)
-file.close()
-op_lat = list(); op_lon = list(); op_prof = list()
-cl_lat = list(); cl_lon = list()
-for i in range(len(longitudes)):
-    if i+1 in open_stations:
-        op_lat.append(latitudes[i]); op_lon.append(longitudes[i]); op_prof.append(profiles[i])
-    else:
-        cl_lat.append(latitudes[i]); cl_lon.append(longitudes[i])
-
-
-
-
-# dd = {'latitude':op_lat, 'longitude':op_lon}
-# df = pd.DataFrame(data = dd)
-# df.to_excel('OPENEDPROVISIONALOPEN.xlsx')
-
-ddd = {'latitude':op_lat, 'longitude':op_lon, 'profile':op_prof}
-ddff = pd.DataFrame(data = ddd)
-ddff.to_excel('PROVISIONAL.xlsx')
+print(f'{cont} unassigned profile stations')
 
 #%%
-# %%
+# Load chosen stations and number of chargers (greedy)
+file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
+file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
+
+
+lat = list();lon = list();g_char = list();prof = list()
+for i in range(len(longitudes)):
+    if i+1 in open_stations:
+        lat.append(latitudes[i]); lon.append(longitudes[i])
+        g_char.append(number_of_chargers[i+1])
+        prof.append(profiles[i])
+
+ddd = {'latitude':lat, 'longitude':lon, 'Greedy Chargers':g_char,'profile':prof}
+
+ddff = pd.DataFrame(data = ddd)
+ddff.to_excel('AIMMS_results.xlsx')
+
+#%%
+
+
+
+
+
+
+
+
+
+#%%
