@@ -374,6 +374,7 @@ def test_scenario_sensitivity(S,K,K_s,n,a,t):
     for k in K:
         if dummy_0[k].X > 0.5:
             results["infeasible"].append(k)
+    results["gap"] = mp.MIPGAP
 
     return results
 
