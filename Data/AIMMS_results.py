@@ -41,7 +41,6 @@ for i in stations.index:
 file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
 file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
 
-
 lat = list();lon = list();g_char = list();prof = list()
 for i in range(len(longitudes)):
     if i+1 in open_stations:
@@ -83,7 +82,7 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
     print('Starting charging routes reconstruction:')
 
     for idx,s in enumerate(S):
-        if idx%10==0:print(f'{round(100*idx/len(S),2)}%')
+        if idx%25==0:print(f'{round(100*idx/len(S),2)}%')
         charger_num = Results[f'Chargers'][s]
         return_K = dict()
 
@@ -225,4 +224,92 @@ print(f'Avg waiting time \t{weight_scenarios(val)}\t{round(min(val.values()),2)}
 
 val = avg_driving_charging_cost; lower_bound, upper_bound = compute_interval(list(val.values()))
 print(f'Expected cost \t\t{round(weight_scenarios(val),1)} {round(min(val.values()),1)}  {round(lower_bound,1)} {round(upper_bound,1)} {round(max(val.values()),1)}')
+
+
+#%%
+# Find My Station
+lat = list();lon = list();g_char = list();prof = list()
+for i in range(len(longitudes)):
+    if i+1 in open_stations:
+        lat.append(latitudes[i]); lon.append(longitudes[i])
+        g_char.append(number_of_chargers[i+1])
+        prof.append(profiles[i])
+
+stations = {'station':list(range(len(lat))),'latitude':lat, 'longitude':lon, 'chargers':g_char, 'profile':prof}
+
+
+
+import math
+
+def haversine(lat1, lon1, lat2, lon2):
+    """
+    Calculate the great-circle distance between two points 
+    on the Earth's surface given their latitude and longitude
+    in decimal degrees.
+    """
+    R = 6371  # Radius of the Earth in kilometers
+
+    # Convert latitude and longitude from degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Haversine formula
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = R * c
+
+    return distance
+
+def find_closest_stations(stations, lat, lon, max_dist):
+    """
+    Find the ten closest stations to the given latitude and longitude,
+    within the specified maximum distance, and generate an Excel file
+    with the feasible stations in a sheet called 'Results'.
+    
+    Parameters:
+        stations (dict): The dictionary containing station information.
+        lat (float): Latitude of the new coordinate.
+        lon (float): Longitude of the new coordinate.
+        max_dist (float): Maximum distance in miles.
+        file_path (str): Path to the output Excel file.
+    """
+    distances = []
+
+    for i in range(len(stations['station'])):
+        station_lat = stations['latitude'][i]
+        station_lon = stations['longitude'][i]
+        distance_miles = haversine(lat, lon, station_lat, station_lon)
+
+        if distance_miles <= max_dist:
+            distances.append((stations['station'][i], distance_miles))
+
+    # Sort stations based on distance (closest first)
+    distances.sort(key=lambda x: x[1])
+
+    # Get the feasible stations (maximum ten or stations within max_dist)
+    feasible_stations = [station[0] for station in distances[:10]]
+
+    # Create a DataFrame for the feasible stations
+    df = pd.DataFrame({'Feasible Stations': feasible_stations})
+
+    # Create an Excel writer and write the DataFrame to the file
+    writer = pd.ExcelWriter('../FindMyStation.xlsx', engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Results', index=False)
+
+    # Close the Excel writer and save the file
+    writer.save()
+
+
+new_lat = 40.632138
+new_lon = -80.054285
+max_distance = 80  # Maximum distance in miles
+
+closest_stations = find_closest_stations(stations, new_lat, new_lon, max_distance)
+print(closest_stations)
+
+
 # %%
