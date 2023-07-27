@@ -41,11 +41,6 @@ for i in stations.index:
 file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
 file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
 
-
-
-file = open('../data/datafile')
-
-
 lat = list();lon = list();g_char = list();prof = list()
 for i in range(len(longitudes)):
     if i+1 in open_stations:
@@ -240,7 +235,7 @@ for i in range(len(longitudes)):
         g_char.append(number_of_chargers[i+1])
         prof.append(profiles[i])
 
-stations = {'station':list(range(len(lat))),'latitude':lat, 'longitude':lon, 'chargers':g_char,'profile':prof}
+stations = {'station':list(range(len(lat))),'latitude':lat, 'longitude':lon, 'chargers':g_char, 'profile':prof}
 
 
 
