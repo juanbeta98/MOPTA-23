@@ -208,7 +208,7 @@ val = active_stations; lower_bound, upper_bound = compute_interval(list(val.valu
 print(f'Avg active stations \t{weight_scenarios(val)} \t{min(val.values())} \t{lower_bound} \t{upper_bound} \t{max(val.values())}')
 
 val = [len(K[sc])/greedy_number_of_stations for sc in SC]; lower_bound, upper_bound = compute_interval(val)
-print(f'Avg serviced car \t{round(sum(val)/25,2)} \t{round(min(val),2)} \t{lower_bound} \t{upper_bound} \t{round(max(val),2)}')
+print(f'Avg serviced car \t{weight_scenarios(val)} \t{round(min(val),2)} \t{lower_bound} \t{upper_bound} \t{round(max(val),2)}')
 
 val = avg_charging_time; lower_bound, upper_bound = compute_interval(list(val.values()))
 print(f'Avg charging time \t{weight_scenarios(val)} \t{round(min(val.values()),2)} \t{lower_bound} \t{upper_bound}\t{round(max(val.values()),2)}')
@@ -217,7 +217,7 @@ val = avg_distance; lower_bound, upper_bound = compute_interval(list(val.values(
 print(f'Avg traveled distance \t{weight_scenarios(val)} \t{round(min(val.values()),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val.values()),2)}')
 
 val = [avg_utilization[i]/latest_finalization[i] for i in SC]; lower_bound, upper_bound = compute_interval(val)
-print(f'Avg Utilization: \t{round(sum(val)/25,2)} \t{round(min(val),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val),2)}')
+print(f'Avg Utilization: \t{weight_scenarios(val)} \t{round(min(val),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val),2)}')
 
 val = avg_waiting_time; lower_bound, upper_bound = compute_interval(list(val.values()))
 print(f'Avg waiting time \t{weight_scenarios(val)}\t{round(min(val.values()),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val.values()),2)}')
