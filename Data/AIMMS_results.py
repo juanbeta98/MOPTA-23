@@ -83,7 +83,6 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
 
     for idx,s in enumerate(S):
         if idx%25==0:print(f'{round(100*idx/len(S),2)}%')
-        charger_num = Results[f'Chargers'][s]
         return_K = dict()
 
         # Retrieve information from all scenarios
@@ -92,7 +91,6 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
             K, K_s, S_k, a, t = load_pickle(path,sc)
             return_K[sc] = K
             file = open(f'{path}/p/p_{sc}','rb'); p = pickle.load(file); file.close()
-            active_char = 0
             
             routes = Results[sc]['routes'][s]
 
