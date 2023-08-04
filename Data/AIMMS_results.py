@@ -41,10 +41,11 @@ for i in stations.index:
 file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
 file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
 
-lat = list();lon = list();g_char = list();prof = list()
+lat = list();lon = list();stress = list();g_char = list();prof = list()
 for i in range(len(longitudes)):
     if i+1 in open_stations:
         lat.append(latitudes[i]); lon.append(longitudes[i])
+        stress.append([0])
         g_char.append(number_of_chargers[i+1])
         prof.append(profiles[i])
 
@@ -150,7 +151,6 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
 
 def weight_scenarios(iterable):
     return round(sum(iterable[sc] for sc in range(25))/25,2)
-
 
 def compute_interval(iterable):
     # Compute mean and standard deviation
@@ -309,5 +309,119 @@ max_distance = 80  # Maximum distance in miles
 closest_stations = find_closest_stations(stations, new_lat, new_lon, max_distance)
 print(closest_stations)
 
+
+# %%
+
+#%%
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+from matplotlib.patches import PathPatch
+from matplotlib.patheffects import withStroke
+
+
+def generate_text_image(name, kpi, expected_performance):
+    fig, ax = plt.subplots(figsize=(8, 4))
+    
+    # Set the background color to transparent
+    fig.patch.set_alpha(0)
+
+    # Add text for the name of the plot (larger, black, bold)
+    ax.text(0.5, 0.85, name, fontsize=35, color='black', weight='bold',
+            ha='center', va='center', transform=ax.transAxes)
+
+    # Add text for the KPI number
+    ax.text(0.5, 0.5, f'{kpi:.2f}', fontsize=50, color='black', weight='bold',
+            ha='center', va='center', transform=ax.transAxes)
+
+    # Calculate the difference in percentage
+    difference_percentage = ((kpi - expected_performance) / expected_performance) * 100
+    difference_text = f'Difference: {difference_percentage:.2f}%'
+
+    # Determine text color based on the sign of the difference
+    text_color = 'green' if difference_percentage >= 0 else 'red'
+
+    # Create path effects to add a black contour to the text
+    stroke_effect = withStroke(linewidth=1, foreground='black')
+
+    # Add text for the difference in percentage with red fill, black contour, and custom font
+    ax.text(0.5, 0.2, difference_text, fontsize=35, color=text_color,
+            weight='bold', ha='center', va='center', transform=ax.transAxes,
+            path_effects=[stroke_effect], fontname='Arial Narrow')
+
+    # Add horizontal line segments (wider lines)
+    ax.hlines(y=0, xmin=-50, xmax=-25, color='black', linewidth=5)
+    ax.hlines(y=0, xmin=25, xmax=50, color='black', linewidth=5)
+
+    # Remove axes for a cleaner image
+    ax.axis('off')
+
+    # Save the image to the specified output file
+    # plt.savefig(output_filename, dpi=300, bbox_inches='tight', transparent=True)
+
+    plt.show()
+
+generate_text_image('Service Level', 16, 100)
+# %%
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from matplotlib.patches import PathPatch
+from matplotlib.path import Path
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def generate_gantt_diagram_for_station(station_id, station_schedule):
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    charger_count = len(station_schedule)
+
+    max_duration = 0
+    for charger in range(charger_count):
+        if 'start' in station_schedule[charger]:
+            start_times = station_schedule[charger]['start']
+            end_times = station_schedule[charger]['end']
+            
+            for start_time, end_time in zip(start_times, end_times):
+                duration = end_time - start_time
+                if duration > max_duration:
+                    max_duration = duration
+
+    # Calculate a common bar width based on the maximum duration
+    common_bar_width = max_duration / 10  # You can adjust the denominator to control bar width
+    
+    for charger in range(charger_count):
+        charger_schedule = []  # List to store tuples (start, duration) for each vehicle
+
+        if 'start' in station_schedule[charger]:
+            start_times = station_schedule[charger]['start']
+            end_times = station_schedule[charger]['end']
+            wait_times = station_schedule[charger]['wait']  # Add the wait times
+            
+            for start_time, end_time, wait_time in zip(start_times, end_times, wait_times):
+                duration = end_time - start_time
+                charger_schedule.append((start_time, duration, wait_time))
+
+        # Plotting Gantt bars for each charger
+        for idx, (start, duration, wait_time) in enumerate(charger_schedule):
+            color = plt.cm.tab20(idx)  # Get a unique color from the palette for each vehicle
+            hatch = '/' if wait_time > 0 else None  # Set hatch for waiting periods
+            
+            ax.barh(charger, duration, left=start, height=0.6,
+                    color=color, alpha=0.6, edgecolor='black', linewidth=0.5, hatch=hatch)
+
+    # Configure axes and labels
+    ax.set_xlabel('Time')
+    ax.set_yticks(range(charger_count))
+    ax.set_yticklabels([f'Charger {i+1}' for i in range(charger_count)])
+    ax.set_title(f'Charging Schedule of station {station_id}')
+
+    plt.show()
+
+
+
+generate_gantt_diagram_for_station(1,schedules[0][open_stations[1]])
 
 # %%
