@@ -7,7 +7,10 @@ from scipy import stats
 
 path = os.getcwd()
 
+
 #%%
+
+#%% Read main data
 # Read main data
 stations = pd.read_csv(path+"/fuel_stations.csv")
 profile = pd.read_excel(path+"/CountyProfile.xlsx", index_col=0)
@@ -36,20 +39,32 @@ for i in stations.index:
             profiles.append('Urban')
             cont += 1
 
+
+#%% Stres Index
+# Stres Index
+file = open('../MultiObjective/Configurations/Stress Index/stress_index_0.0', 'rb')
+data = pickle.load(file)
+file.close()
+
+stress_index = {i:sum(data[sc][i] for sc in range(25))/25 for i in data[0].keys()}
+
 #%%
 # Load chosen stations and number of chargers (greedy)
 file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
 file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
 
 lat = list();lon = list();stress = list();g_char = list();prof = list()
+
+cont = 0
 for i in range(len(longitudes)):
     if i+1 in open_stations:
         lat.append(latitudes[i]); lon.append(longitudes[i])
-        stress.append([0])
         g_char.append(number_of_chargers[i+1])
         prof.append(profiles[i])
 
-ddd = {'latitude':lat, 'longitude':lon, 'Greedy Chargers':g_char,'profile':prof}
+        stress.append(stress_index[i+1])
+
+ddd = {'latitude':lat, 'longitude':lon,'Greedy Chargers':g_char,'stress':stress,'profile':prof}
 
 ddff = pd.DataFrame(data = ddd)
 ddff.to_excel('AIMMS_results.xlsx')
@@ -365,16 +380,12 @@ def generate_text_image(name, kpi, expected_performance):
 
 generate_text_image('Service Level', 16, 100)
 # %%
-import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.patches import PathPatch
-from matplotlib.path import Path
-
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def generate_gantt_diagram_for_station(station_id, station_schedule):
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(16, 6))
 
     charger_count = len(station_schedule)
 
@@ -388,9 +399,6 @@ def generate_gantt_diagram_for_station(station_id, station_schedule):
                 duration = end_time - start_time
                 if duration > max_duration:
                     max_duration = duration
-
-    # Calculate a common bar width based on the maximum duration
-    common_bar_width = max_duration / 10  # You can adjust the denominator to control bar width
     
     for charger in range(charger_count):
         charger_schedule = []  # List to store tuples (start, duration) for each vehicle
@@ -398,30 +406,83 @@ def generate_gantt_diagram_for_station(station_id, station_schedule):
         if 'start' in station_schedule[charger]:
             start_times = station_schedule[charger]['start']
             end_times = station_schedule[charger]['end']
-            wait_times = station_schedule[charger]['wait']  # Add the wait times
             
-            for start_time, end_time, wait_time in zip(start_times, end_times, wait_times):
+            for start_time, end_time in zip(start_times, end_times):
                 duration = end_time - start_time
-                charger_schedule.append((start_time, duration, wait_time))
+                start_time *= 60
+                start_time += 7*60
+                duration *= 60
+                charger_schedule.append((start_time, duration))
 
         # Plotting Gantt bars for each charger
-        for idx, (start, duration, wait_time) in enumerate(charger_schedule):
+        for idx, (start, duration) in enumerate(charger_schedule):
             color = plt.cm.tab20(idx)  # Get a unique color from the palette for each vehicle
-            hatch = '/' if wait_time > 0 else None  # Set hatch for waiting periods
             
             ax.barh(charger, duration, left=start, height=0.6,
-                    color=color, alpha=0.6, edgecolor='black', linewidth=0.5, hatch=hatch)
+                    color=color, alpha=0.6, edgecolor='black', linewidth=0.5)
 
     # Configure axes and labels
-    ax.set_xlabel('Time')
+    ax.set_xlabel('Time',fontsize=20,weight='bold')
+    ax.set_xlim(7*60, 21*60)  # X-axis limits from 7:00 to 21:00 (in minutes)
+    ax.set_xticks(range(7*60, 22*60, 60))  # Every hour from 7:00 to 21:00 (in minutes)
+    ax.set_xticklabels([f'{hour:02d}:00' for hour in range(7, 22)],fontsize=18)
     ax.set_yticks(range(charger_count))
-    ax.set_yticklabels([f'Charger {i+1}' for i in range(charger_count)])
-    ax.set_title(f'Charging Schedule of station {station_id}')
+    ax.set_yticklabels([f'Charger {i+1}' for i in range(charger_count)],fontsize=18,weight='bold')
+    ax.set_title(f'Charging Schedule of station {station_id}',fontsize=25,weight='bold')
 
+    plt.tight_layout()
+    plt.show()
+
+
+station = 3
+generate_gantt_diagram_for_station(station,schedules[0][open_stations[station]])
+
+# %%
+import matplotlib.pyplot as plt
+station = 1
+schedules_1 = schedules[0]
+
+def display_demand(schedules):
+    charging_counts = []  # List to store the number of charging cars at each interval
+    time_intervals = [i for i in range(7*60, 21*60)]
+
+    for t in time_intervals:
+        charging_cars = 0
+
+        for station_id, station_schedule in schedules.items():
+            charger_count = len(station_schedule)
+
+            for charger in range(charger_count):
+                if 'start' in station_schedule[charger]:
+                    start_times = station_schedule[charger]['start']
+                    end_times = station_schedule[charger]['end']
+                    
+                    for start_time, end_time in zip(start_times, end_times):
+                        if start_time*60 <= t < end_time*60:
+                            charging_cars += 1
+        
+        charging_counts.append(charging_cars)
+    
+    fig,ax = plt.subplots(figsize=(16, 6))
+    plt.plot(time_intervals, charging_counts, linestyle='-', color='purple',linewidth=2.9)
+    
+    plt.xlabel('Time',fontsize=20,weight='bold')
+    plt.ylabel('Number of Charging Cars',fontsize=18,weight='bold')
+    plt.title(f'Charging Demand',fontsize=25,weight='bold')
+    
+    ax.set_xlim(7*60, 21*60)  # X-axis limits from 7:00 to 21:00 (in minutes)
+    ax.set_xticks(range(7*60, 22*60, 60))  # Every hour from 7:00 to 21:00 (in minutes)
+    ax.set_xticklabels([f'{hour:02d}:00' for hour in range(7, 22)],fontsize=18)
+
+    ax.set_ylim(0,max(charging_counts)+20)
+    ax.tick_params(axis='y', labelsize=18) 
+
+    plt.tight_layout()
     plt.show()
 
 
 
-generate_gantt_diagram_for_station(1,schedules[0][open_stations[1]])
+display_demand(schedules_1)
+
 
 # %%
