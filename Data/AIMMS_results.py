@@ -48,7 +48,7 @@ file.close()
 
 stress_index = {i:sum(data[sc][i] for sc in range(25))/25 for i in data[0].keys()}
 
-#%%
+#%% Load chosen stations and number of chargers (greedy)
 # Load chosen stations and number of chargers (greedy)
 file = open('../Results/Optimal/S', 'rb');open_stations = pickle.load(file);file.close()
 file = open('../Results/Optimal/n', 'rb');number_of_chargers = pickle.load(file);file.close()
@@ -69,7 +69,7 @@ ddd = {'latitude':lat, 'longitude':lon,'Greedy Chargers':g_char,'stress':stress,
 ddff = pd.DataFrame(data = ddd)
 ddff.to_excel('AIMMS_results.xlsx')
 
-#%% 
+#%% Recostructing routes function
 # Recostructing routes function
 os.chdir('../')
 from source import *
@@ -94,6 +94,9 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
 
     avg_driving_charging_cost = {sc:0 for sc in simulations}
     latest_finalization = {sc:0 for sc in simulations}
+
+    exp_waiting_time = {s:0 for s in S}
+    exp_utilization = {s:0 for s in S}
             
     print('Starting charging routes reconstruction:')
 
@@ -109,20 +112,22 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
             file = open(f'{path}/p/p_{sc}','rb'); p = pickle.load(file); file.close()
             
             routes = Results[sc]['routes'][s]
-
             schedules[sc][s] = list()
 
             # Station has no assigned vehicles that scenario (unactive)
-            if len(routes) == 0: 
-                continue
+            if len(routes) == 0:    continue
             
             station_is_active = True
             active_chargers[sc] += Results['Chargers'][s]
+
+            number_of_vehicles = 0
+            total_waiting_time = 0
 
             for route in routes:
                 schedule = {'vehicles':list(), 'arrive':list(),'wait':list(), 'start':list(), 'end':list()}
 
                 for pos, vehicle in enumerate(route):
+                    number_of_vehicles += 1
                     visited[sc].append(vehicle)
                     avg_distance[sc] += distances[s,vehicle]/len(Results[sc]['total_total'])
                     schedule['vehicles'].append(vehicle)
@@ -145,6 +150,9 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
                         schedule['start'].append(schedule['arrive'][-1] + schedule['wait'][-1])
                         schedule['end'].append(schedule['start'][-1] + t[vehicle,s])
 
+                        exp_utilization[s] += schedule['end'][-1] - schedule['start'][-1]
+                        total_waiting_time += schedule['wait'][-1]
+
                     avg_charging_time[sc] += (schedule['end'][-1] - schedule['start'][-1])/len(Results[sc]['total_total'])
                     avg_utilization[sc] += schedule['end'][-1] - schedule['start'][-1]
 
@@ -152,20 +160,26 @@ def reconstruct_routes(S,distances,Results,sim_num:int=25):
                 
                 schedules[sc][s].append(schedule)
 
+            exp_waiting_time[s] += (total_waiting_time / number_of_vehicles)/25
+
             if station_is_active: 
                 active_stations[sc] += 1
                 
-
             latest_finalization[sc] = max(schedule['end'][-1], 14)
 
+    total_number_of_chargers = sum(Results['Chargers'][s] for s in S)
     for sc in range(25):
-        avg_utilization[sc] = (avg_utilization[sc] / active_chargers[sc])
+        avg_utilization[sc] = avg_utilization[sc] / (active_chargers[sc]*14*60)
+    
+    for s in S:
+        exp_utilization[s] /= (Results['Chargers'][s] * 25 * 14 * 60)
+        exp_utilization *= 100
 
     return schedules, active_stations, avg_distance, visited, avg_charging_time, avg_utilization, \
-                avg_waiting_time, avg_driving_charging_cost, latest_finalization, return_K
+                avg_waiting_time, avg_driving_charging_cost, latest_finalization, return_K, exp_utilization, exp_waiting_time
 
 def weight_scenarios(iterable):
-    return round(sum(iterable[sc] for sc in range(25))/25,2)
+    return round(sum(iterable[sc] for sc in range(25))/25,5)
 
 def compute_interval(iterable):
     # Compute mean and standard deviation
@@ -188,21 +202,21 @@ def compute_interval(iterable):
     lower_bound = mean - t_value * std_err
     upper_bound = mean + t_value * std_err
 
-    return round(lower_bound,2), round(upper_bound,2)
+    return round(lower_bound,5), round(upper_bound,5)
 
 
 
-#%%
+#%% Recostructing routes
 # Recostructing routes
 file = open('../Results/Optimal/distances', 'rb');distances = pickle.load(file);file.close()
 file = open(f'../Results/Optimal/results', 'rb')
 Results = pickle.load(file)
 file.close()
 
-schedules, active_stations, avg_distance, visited, avg_charging_time, avg_utilization, \
-avg_waiting_time, avg_driving_charging_cost, latest_finalization, K = reconstruct_routes(open_stations,distances,Results,25)
+schedules, active_stations, avg_distance, visited, avg_charging_time, avg_utilization, avg_waiting_time, avg_driving_charging_cost, \
+    latest_finalization, K, exp_utilization, exp_waiting_time = reconstruct_routes(open_stations,distances,Results,25)
 
-#%% 
+#%% Print overall performance
 # Print overall performance
 print(f'- Number of active stations: {sum([1 for value in Results["Chargers"].values() if value != 0])}')
 print(f'- Number of chargers: {sum(Results["Chargers"].values())} \n')
@@ -230,7 +244,7 @@ val = avg_distance; lower_bound, upper_bound = compute_interval(list(val.values(
 print(f'Avg traveled distance \t{weight_scenarios(val)} \t{round(min(val.values()),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val.values()),2)}')
 
 val = [avg_utilization[i]/latest_finalization[i] for i in SC]; lower_bound, upper_bound = compute_interval(val)
-print(f'Avg Utilization: \t{weight_scenarios(val)} \t{round(min(val),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val),2)}')
+print(f'Avg Utilization: \t{weight_scenarios(val)} \t{round(min(val),5)}  \t{lower_bound} \t{upper_bound} \t{round(max(val),5)}')
 
 val = avg_waiting_time; lower_bound, upper_bound = compute_interval(list(val.values()))
 print(f'Avg waiting time \t{weight_scenarios(val)}\t{round(min(val.values()),2)}  \t{lower_bound} \t{upper_bound} \t{round(max(val.values()),2)}')
@@ -241,6 +255,35 @@ print(f'Expected cost \t\t{round(weight_scenarios(val),1)} {round(min(val.values
 
 #%%
 # Find My Station
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 lat = list();lon = list();g_char = list();prof = list()
 for i in range(len(longitudes)):
     if i+1 in open_stations:
@@ -324,8 +367,6 @@ max_distance = 80  # Maximum distance in miles
 closest_stations = find_closest_stations(stations, new_lat, new_lon, max_distance)
 print(closest_stations)
 
-
-# %%
 
 #%%
 import matplotlib.pyplot as plt
