@@ -1,2 +1,2 @@
 # MOPTA-23
-Collection of resources for the 2023 MOPTA competition by Industrial Engineering Students from Colombia. We will be participating in representation of COPA, from Universidad de Los Andes.
+ Aresource compilation for the 2023 MOPTA competition by the winning team, OptiCoffee, from Colombia. We represented COPA on behalf of the Universidad de Los Andes.
